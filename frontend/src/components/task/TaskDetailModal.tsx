@@ -10,11 +10,10 @@ import {
   Clock,
   Trash2,
   Send,
-  Flag,
 } from 'lucide-react';
 import { useProject } from '@/context/ProjectContext';
 import { TaskStatus, TaskPriority } from '@/lib/types';
-import { cn, getPriorityBadge, getStatusDetails, formatDate } from '@/lib/utils';
+import { cn, getPriorityBadge, formatDate } from '@/lib/utils';
 
 export default function TaskDetailModal() {
   const {
@@ -34,7 +33,6 @@ export default function TaskDetailModal() {
 
   const project = projects.find((p) => p.id === selectedTask.projectId);
   const priorityBadge = getPriorityBadge(selectedTask.priority);
-  const statusDetails = getStatusDetails(selectedTask.status);
 
   const completedSubtasks = selectedTask.subtasks.filter((st) => st.completed).length;
   const subtaskProgress =
@@ -50,29 +48,29 @@ export default function TaskDetailModal() {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-end p-0 md:p-4 animate-in fade-in duration-200">
-      <div className="w-full max-w-2xl h-full md:h-[92vh] rounded-none md:rounded-2xl bg-[#0f172a] border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-end p-0 md:p-4 animate-in fade-in duration-200">
+      <div className="w-full max-w-2xl h-full md:h-[92vh] rounded-none md:rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
         {/* Drawer Header */}
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">
+            <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded border border-indigo-100">
               {selectedTask.code}
             </span>
-            <span className="text-xs text-slate-400 truncate max-w-[200px]">
-              {project?.name || 'Workspace Project'}
+            <span className="text-xs text-slate-500 font-medium truncate max-w-[200px]">
+              {project?.name || 'Core Workspace'}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => deleteTask(selectedTask.id)}
               title="Delete Task"
-              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => setSelectedTask(null)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -83,23 +81,23 @@ export default function TaskDetailModal() {
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Title & Description */}
           <div>
-            <h2 className="text-lg font-bold text-white mb-2">{selectedTask.title}</h2>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/50 p-3 rounded-xl border border-slate-800/80">
+            <h2 className="text-lg font-bold text-slate-900 mb-2">{selectedTask.title}</h2>
+            <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200 font-medium">
               {selectedTask.description || 'No detailed description provided.'}
             </p>
           </div>
 
           {/* Quick Controls Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
             {/* Status Selector */}
             <div>
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
                 Status
               </span>
               <select
                 value={selectedTask.status}
                 onChange={(e) => updateTaskStatus(selectedTask.id, e.target.value as TaskStatus)}
-                className="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-lg p-1.5 focus:outline-none"
+                className="w-full bg-white border border-slate-200 text-slate-800 text-xs font-bold rounded-lg p-1.5 focus:outline-none"
               >
                 <option value="backlog">Backlog</option>
                 <option value="todo">To Do</option>
@@ -111,13 +109,13 @@ export default function TaskDetailModal() {
 
             {/* Priority Selector */}
             <div>
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
                 Priority
               </span>
               <select
                 value={selectedTask.priority}
                 onChange={(e) => updateTaskPriority(selectedTask.id, e.target.value as TaskPriority)}
-                className="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-lg p-1.5 capitalize focus:outline-none"
+                className="w-full bg-white border border-slate-200 text-slate-800 text-xs font-bold rounded-lg p-1.5 capitalize focus:outline-none"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -128,41 +126,41 @@ export default function TaskDetailModal() {
 
             {/* Assignee */}
             <div>
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
                 Assignee
               </span>
               <div className="flex items-center gap-1.5 pt-0.5">
-                <div className="relative w-5 h-5 rounded-full overflow-hidden border border-slate-700">
+                <div className="relative w-5 h-5 rounded-full overflow-hidden border border-slate-300">
                   <Image src={selectedTask.assignee.avatar} alt="" fill className="object-cover" />
                 </div>
-                <span className="text-xs text-slate-200 truncate">{selectedTask.assignee.name}</span>
+                <span className="text-xs font-semibold text-slate-800 truncate">{selectedTask.assignee.name}</span>
               </div>
             </div>
 
             {/* Due Date */}
             <div>
-              <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
                 Due Date
               </span>
-              <span className="text-xs text-slate-200">{formatDate(selectedTask.dueDate)}</span>
+              <span className="text-xs font-semibold text-slate-800">{formatDate(selectedTask.dueDate)}</span>
             </div>
           </div>
 
           {/* Subtasks Checklist */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-white flex items-center gap-2">
-                <CheckSquare className="w-4 h-4 text-indigo-400" />
+              <span className="text-xs font-bold text-slate-900 flex items-center gap-2">
+                <CheckSquare className="w-4 h-4 text-indigo-600" />
                 Subtasks Checklist ({completedSubtasks}/{selectedTask.subtasks.length})
               </span>
-              <span className="text-xs text-indigo-400 font-mono font-medium">
+              <span className="text-xs text-indigo-700 font-mono font-bold">
                 {subtaskProgress}%
               </span>
             </div>
             {/* Progress bar */}
-            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mb-3">
+            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mb-3">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-cyan-500 transition-all duration-300"
+                className="h-full bg-indigo-600 transition-all duration-300"
                 style={{ width: `${subtaskProgress}%` }}
               />
             </div>
@@ -171,17 +169,17 @@ export default function TaskDetailModal() {
                 <button
                   key={st.id}
                   onClick={() => toggleSubtask(selectedTask.id, st.id)}
-                  className="w-full flex items-center gap-2.5 p-2 rounded-lg bg-slate-900/60 border border-slate-800 hover:bg-slate-800/60 text-left transition-colors"
+                  className="w-full flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-left transition-colors font-medium"
                 >
                   {st.completed ? (
-                    <CheckSquare className="w-4 h-4 text-emerald-400" />
+                    <CheckSquare className="w-4 h-4 text-emerald-600" />
                   ) : (
-                    <Square className="w-4 h-4 text-slate-500" />
+                    <Square className="w-4 h-4 text-slate-400" />
                   )}
                   <span
                     className={cn(
                       'text-xs',
-                      st.completed ? 'text-slate-500 line-through' : 'text-slate-200'
+                      st.completed ? 'text-slate-400 line-through' : 'text-slate-800'
                     )}
                   >
                     {st.title}
@@ -189,48 +187,48 @@ export default function TaskDetailModal() {
                 </button>
               ))}
               {selectedTask.subtasks.length === 0 && (
-                <p className="text-xs text-slate-500 italic">No subtasks defined for this task.</p>
+                <p className="text-xs text-slate-400 italic">No subtasks created.</p>
               )}
             </div>
           </div>
 
           {/* Time Tracking */}
-          <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <Clock className="w-4 h-4 text-cyan-400" />
+              <Clock className="w-4 h-4 text-indigo-600" />
               <div>
-                <div className="text-xs font-medium text-slate-200">Time Logging</div>
-                <div className="text-[11px] text-slate-400">
+                <div className="text-xs font-bold text-slate-900">Time Logging</div>
+                <div className="text-[11px] text-slate-500">
                   {selectedTask.timeLoggedHours}h logged of {selectedTask.estimatedHours}h estimated
                 </div>
               </div>
             </div>
-            <div className="text-xs font-mono text-cyan-300 font-semibold px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/20">
+            <div className="text-xs font-mono text-indigo-700 font-bold px-2.5 py-1 rounded bg-indigo-50 border border-indigo-100">
               {Math.round((selectedTask.timeLoggedHours / selectedTask.estimatedHours) * 100)}%
             </div>
           </div>
 
           {/* Comments Stream */}
           <div>
-            <span className="text-xs font-semibold text-white flex items-center gap-2 mb-3">
-              <MessageSquare className="w-4 h-4 text-indigo-400" />
+            <span className="text-xs font-bold text-slate-900 flex items-center gap-2 mb-3">
+              <MessageSquare className="w-4 h-4 text-indigo-600" />
               Activity & Comments ({selectedTask.comments.length})
             </span>
             <div className="space-y-3 mb-4">
               {selectedTask.comments.map((cm) => (
-                <div key={cm.id} className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80 space-y-1">
+                <div key={cm.id} className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="relative w-5 h-5 rounded-full overflow-hidden">
                         <Image src={cm.userAvatar} alt="" fill className="object-cover" />
                       </div>
-                      <span className="text-xs font-medium text-white">{cm.userName}</span>
+                      <span className="text-xs font-bold text-slate-900">{cm.userName}</span>
                     </div>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[10px] text-slate-400">
                       {new Date(cm.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 pl-7">{cm.content}</p>
+                  <p className="text-xs text-slate-700 pl-7 font-medium">{cm.content}</p>
                 </div>
               ))}
             </div>
@@ -241,12 +239,12 @@ export default function TaskDetailModal() {
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Write a comment or status update..."
-                className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                placeholder="Write a comment or update..."
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white"
               />
               <button
                 type="submit"
-                className="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+                className="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition-colors shadow-xs"
               >
                 <Send className="w-4 h-4" />
               </button>

@@ -5,10 +5,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   Bell,
-  Filter,
   Plus,
   SlidersHorizontal,
-  UserCheck,
   CheckCircle2,
   AlertCircle,
   X,
@@ -55,16 +53,16 @@ export default function TopHeader() {
   const pageInfo = getPageTitle();
 
   return (
-    <header className="h-16 border-b border-slate-800/60 bg-[#0b0f19]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20">
+    <header className="h-16 border-b border-slate-200 bg-white/90 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20 shadow-2xs">
       {/* Page Title & Breadcrumbs */}
       <div>
-        <h1 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
+        <h1 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
           {pageInfo.title}
-          <span className="text-[11px] font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
             {filteredTasks.length} tasks
           </span>
         </h1>
-        <p className="text-xs text-slate-400">{pageInfo.subtitle}</p>
+        <p className="text-xs text-slate-500">{pageInfo.subtitle}</p>
       </div>
 
       {/* Header Actions */}
@@ -74,27 +72,27 @@ export default function TopHeader() {
           <button
             onClick={() => setShowFilterDropdown(!showFilterDropdown)}
             className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors',
+              'flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors shadow-2xs',
               priorityFilter !== 'all' || assigneeFilter !== 'all'
-                ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/40'
-                : 'bg-slate-900/80 text-slate-300 border-slate-800 hover:border-slate-700'
+                ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
             )}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             <span>Filter</span>
             {(priorityFilter !== 'all' || assigneeFilter !== 'all') && (
-              <span className="w-2 h-2 rounded-full bg-indigo-500" />
+              <span className="w-2 h-2 rounded-full bg-indigo-600" />
             )}
           </button>
 
           {/* Filter Popover */}
           {showFilterDropdown && (
-            <div className="absolute right-0 mt-2 w-64 p-4 rounded-xl bg-[#0f172a] border border-slate-800 shadow-2xl z-50 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span className="text-xs font-semibold text-white">Filter Tasks</span>
+            <div className="absolute right-0 mt-2 w-64 p-4 rounded-2xl bg-white border border-slate-200 shadow-xl z-50 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span className="text-xs font-bold text-slate-900">Filter Tasks</span>
                 <button
                   onClick={() => setShowFilterDropdown(false)}
-                  className="text-slate-400 hover:text-white"
+                  className="text-slate-400 hover:text-slate-600"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -102,7 +100,7 @@ export default function TopHeader() {
 
               {/* Priority Filter */}
               <div>
-                <label className="text-[11px] font-medium text-slate-400 block mb-1.5">
+                <label className="text-[11px] font-semibold text-slate-500 block mb-1.5">
                   Priority
                 </label>
                 <div className="grid grid-cols-2 gap-1.5">
@@ -111,10 +109,10 @@ export default function TopHeader() {
                       key={p}
                       onClick={() => setPriorityFilter(p as TaskPriority | 'all')}
                       className={cn(
-                        'px-2 py-1 rounded text-[11px] capitalize border text-left transition-colors',
+                        'px-2 py-1 rounded-lg text-[11px] capitalize border text-left font-medium transition-colors',
                         priorityFilter === p
-                          ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500'
-                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+                          ? 'bg-indigo-50 text-indigo-700 border-indigo-300 font-bold'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
                       )}
                     >
                       {p}
@@ -125,15 +123,15 @@ export default function TopHeader() {
 
               {/* Assignee Filter */}
               <div>
-                <label className="text-[11px] font-medium text-slate-400 block mb-1.5">
+                <label className="text-[11px] font-semibold text-slate-500 block mb-1.5">
                   Assignee
                 </label>
                 <select
                   value={assigneeFilter}
                   onChange={(e) => setAssigneeFilter(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg p-2 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl p-2 focus:outline-none focus:border-indigo-500 font-medium"
                 >
-                  <option value="all">All Team Members</option>
+                  <option value="all">All Members</option>
                   {users.map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.name} ({u.role})
@@ -149,33 +147,26 @@ export default function TopHeader() {
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="relative p-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-colors"
+            className="relative p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-colors shadow-2xs"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-indigo-500 ring-2 ring-[#0b0f19]" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-600 ring-2 ring-white" />
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 p-4 rounded-xl bg-[#0f172a] border border-slate-800 shadow-2xl z-50 space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                <span className="text-xs font-semibold text-white">Notifications</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
-                  2 Unread
+            <div className="absolute right-0 mt-2 w-80 p-4 rounded-2xl bg-white border border-slate-200 shadow-xl z-50 space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <span className="text-xs font-bold text-slate-900">Notifications</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  Ready
                 </span>
               </div>
-              <div className="space-y-2.5">
-                <div className="flex gap-2.5 p-2 rounded-lg bg-slate-900/60 border border-slate-800/60">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <div className="space-y-2">
+                <div className="flex gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-xs text-slate-200 font-medium">Sprint 42 Target Met</p>
-                    <p className="text-[11px] text-slate-400">16 tasks completed on schedule.</p>
-                  </div>
-                </div>
-                <div className="flex gap-2.5 p-2 rounded-lg bg-slate-900/60 border border-slate-800/60">
-                  <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-xs text-slate-200 font-medium">APEX-101 Needs Review</p>
-                    <p className="text-[11px] text-slate-400">Marcus Chen requested design audit.</p>
+                    <p className="text-xs text-slate-900 font-bold">ApexFlow Workspace Active</p>
+                    <p className="text-[11px] text-slate-500">Add tasks and start tracking velocity.</p>
                   </div>
                 </div>
               </div>
@@ -186,15 +177,15 @@ export default function TopHeader() {
         {/* Primary New Task CTA */}
         <button
           onClick={() => setIsCreateTaskOpen(true)}
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all"
+          className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition-all"
         >
           <Plus className="w-4 h-4" />
           <span>New Task</span>
         </button>
 
         {/* User Profile */}
-        <div className="pl-2 border-l border-slate-800 flex items-center gap-2.5">
-          <div className="relative w-8 h-8 rounded-full overflow-hidden border border-indigo-500/40">
+        <div className="pl-2 border-l border-slate-200 flex items-center gap-2.5">
+          <div className="relative w-8 h-8 rounded-full overflow-hidden border border-slate-300 shadow-2xs">
             <Image
               src={users[0].avatar}
               alt={users[0].name}

@@ -34,11 +34,11 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 h-screen bg-[#0b0f19] border-r border-slate-800/60 flex flex-col flex-shrink-0 select-none z-30">
+    <aside className="w-64 h-screen bg-white border-r border-slate-200 flex flex-col flex-shrink-0 select-none z-30 shadow-sm">
       {/* Brand Header */}
-      <div className="p-4 flex items-center justify-between border-b border-slate-800/60">
+      <div className="p-4 flex items-center justify-between border-b border-slate-100">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-indigo-500/30 group-hover:border-indigo-500/60 transition-colors shadow-lg shadow-indigo-500/10">
+          <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-indigo-100 group-hover:border-indigo-300 transition-colors shadow-sm">
             <Image
               src="/logo.png"
               alt="ApexFlow Logo"
@@ -49,28 +49,28 @@ export default function Sidebar() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-lg tracking-tight text-white group-hover:text-indigo-300 transition-colors">
+              <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
                 ApexFlow
               </span>
-              <span className="text-[10px] font-semibold tracking-wide uppercase px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <span className="text-[10px] font-semibold tracking-wide uppercase px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
                 PRO
               </span>
             </div>
-            <p className="text-xs text-slate-400">Enterprise SaaS</p>
+            <p className="text-xs text-slate-500">Enterprise SaaS</p>
           </div>
         </Link>
       </div>
 
       {/* Workspace Switcher */}
       <div className="p-3">
-        <button className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-slate-900/80 border border-slate-800/80 text-slate-300 hover:text-white hover:border-slate-700 transition-all text-xs font-medium">
+        <button className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 transition-all text-xs font-medium shadow-2xs">
           <div className="flex items-center gap-2 truncate">
-            <div className="w-5 h-5 rounded bg-gradient-to-tr from-indigo-500 to-cyan-500 flex items-center justify-center text-[10px] font-bold text-white">
+            <div className="w-5 h-5 rounded bg-gradient-to-tr from-indigo-600 to-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-xs">
               A
             </div>
-            <span className="truncate">Acme Engineering</span>
+            <span className="truncate font-semibold">Workspace Core</span>
           </div>
-          <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
         </button>
       </div>
 
@@ -78,20 +78,20 @@ export default function Sidebar() {
       <div className="px-3 pb-3 flex items-center gap-2">
         <button
           onClick={() => setIsCommandPaletteOpen(true)}
-          className="flex-1 flex items-center justify-between px-3 py-1.5 rounded-lg bg-slate-900/60 border border-slate-800/60 text-slate-400 text-xs hover:text-slate-200 hover:bg-slate-800/60 transition-colors"
+          className="flex-1 flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-xs hover:text-slate-800 hover:bg-slate-100 transition-colors"
         >
           <div className="flex items-center gap-2">
             <Search className="w-3.5 h-3.5" />
             <span>Search...</span>
           </div>
-          <kbd className="text-[10px] font-mono bg-slate-800 px-1.5 py-0.5 rounded text-slate-400 border border-slate-700">
+          <kbd className="text-[10px] font-mono bg-white px-1.5 py-0.5 rounded text-slate-500 border border-slate-200 shadow-2xs">
             ⌘K
           </kbd>
         </button>
         <button
           onClick={() => setIsCreateTaskOpen(true)}
           title="Quick New Task"
-          className="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all"
+          className="p-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-600/20 transition-all"
         >
           <Plus className="w-4 h-4" />
         </button>
@@ -100,7 +100,7 @@ export default function Sidebar() {
       {/* Main Navigation */}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6">
         <div>
-          <div className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
             Navigation
           </div>
           <nav className="space-y-1">
@@ -112,16 +112,16 @@ export default function Sidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all group',
+                    'flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all group',
                     isActive
-                      ? 'bg-gradient-to-r from-indigo-600/20 to-indigo-600/5 text-indigo-300 border border-indigo-500/30'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                      ? 'bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   )}
                 >
                   <Icon
                     className={cn(
                       'w-4 h-4 transition-colors',
-                      isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'
+                      isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'
                     )}
                   />
                   <span>{item.name}</span>
@@ -134,23 +134,23 @@ export default function Sidebar() {
         {/* Projects Workspace Filter */}
         <div>
           <div className="flex items-center justify-between px-3 mb-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Active Projects
             </span>
-            <FolderKanban className="w-3.5 h-3.5 text-slate-500" />
+            <FolderKanban className="w-3.5 h-3.5 text-slate-400" />
           </div>
           <div className="space-y-1">
             <button
               onClick={() => setSelectedProjectId('all')}
               className={cn(
-                'w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors',
+                'w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs transition-colors',
                 selectedProjectId === 'all'
-                  ? 'text-white font-medium bg-slate-800/80'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+                  ? 'text-slate-900 font-bold bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               )}
             >
-              <span>All Workspace Projects</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+              <span>All Projects</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono">
                 {projects.length}
               </span>
             </button>
@@ -162,10 +162,10 @@ export default function Sidebar() {
                   key={proj.id}
                   onClick={() => setSelectedProjectId(proj.id)}
                   className={cn(
-                    'w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors group',
+                    'w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs transition-colors group',
                     isSelected
-                      ? 'text-indigo-300 font-medium bg-indigo-500/10 border border-indigo-500/20'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+                      ? 'text-indigo-700 font-bold bg-indigo-50 border border-indigo-100'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   )}
                 >
                   <div className="flex items-center gap-2.5 truncate">
@@ -177,7 +177,7 @@ export default function Sidebar() {
                     />
                     <span className="truncate">{proj.name}</span>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-500 group-hover:text-slate-400">
+                  <span className="text-[10px] font-mono text-slate-400 group-hover:text-slate-600">
                     {proj.key}
                   </span>
                 </button>
@@ -187,15 +187,15 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* AI Copilot Badge Footer */}
-      <div className="p-3 border-t border-slate-800/60">
-        <div className="p-2.5 rounded-xl bg-gradient-to-br from-slate-900 to-indigo-950/40 border border-indigo-500/20 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+      {/* AI Flow Footer */}
+      <div className="p-3 border-t border-slate-100">
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-semibold text-white">AI Flow Engine</div>
-            <div className="text-[10px] text-slate-400">Predictive Velocity Active</div>
+            <div className="text-xs font-bold text-slate-900">Apex Engine</div>
+            <div className="text-[10px] text-slate-500">Live Workspace Ready</div>
           </div>
         </div>
       </div>

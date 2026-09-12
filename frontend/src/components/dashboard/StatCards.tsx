@@ -3,7 +3,6 @@
 import React from 'react';
 import { CheckCircle2, Clock, Flame, Zap, ArrowUpRight, TrendingUp } from 'lucide-react';
 import { useProject } from '@/context/ProjectContext';
-import { mockAnalytics } from '@/lib/mockData';
 
 export default function StatCards() {
   const { tasks } = useProject();
@@ -18,34 +17,30 @@ export default function StatCards() {
     {
       title: 'Total Active Tasks',
       value: total.toString(),
-      change: '+14% vs last sprint',
+      change: 'Active in sprint',
       icon: CheckCircle2,
-      color: 'from-indigo-500 to-cyan-500',
-      textColor: 'text-indigo-400',
+      color: 'bg-indigo-50 text-indigo-600 border-indigo-100',
     },
     {
       title: 'In Progress Velocity',
       value: `${inProgress} Tasks`,
-      change: '16 story points active',
+      change: 'In active review',
       icon: Zap,
-      color: 'from-amber-500 to-orange-500',
-      textColor: 'text-amber-400',
+      color: 'bg-amber-50 text-amber-600 border-amber-100',
     },
     {
-      title: 'Sprint Completion Rate',
+      title: 'Sprint Completion',
       value: `${completionRate}%`,
-      change: '+4.2% velocity increase',
+      change: 'Target rate',
       icon: TrendingUp,
-      color: 'from-emerald-500 to-teal-500',
-      textColor: 'text-emerald-400',
+      color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
     },
     {
-      title: 'Urgent Blockers',
+      title: 'Urgent Items',
       value: `${urgent} Critical`,
-      change: 'Requires immediate review',
+      change: 'Requires attention',
       icon: Flame,
-      color: 'from-rose-500 to-pink-500',
-      textColor: 'text-rose-400',
+      color: 'bg-rose-50 text-rose-600 border-rose-100',
     },
   ];
 
@@ -56,22 +51,17 @@ export default function StatCards() {
         return (
           <div
             key={idx}
-            className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700/80 transition-all duration-300 relative overflow-hidden group shadow-lg"
+            className="p-5 rounded-2xl bg-white border border-slate-200/80 hover:border-slate-300 transition-all duration-200 shadow-sm hover:shadow-md relative overflow-hidden group"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-400">{stat.title}</span>
-              <div
-                className={`w-9 h-9 rounded-xl bg-gradient-to-br ${stat.color} p-0.5 shadow-md`}
-              >
-                <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                  <Icon className={`w-4 h-4 ${stat.textColor}`} />
-                </div>
+              <span className="text-xs font-bold text-slate-500">{stat.title}</span>
+              <div className={`w-9 h-9 rounded-xl border flex items-center justify-center ${stat.color}`}>
+                <Icon className="w-4.5 h-4.5" />
               </div>
             </div>
             <div className="flex items-baseline justify-between">
-              <span className="text-2xl font-bold text-white tracking-tight">{stat.value}</span>
-              <div className="flex items-center text-[10px] text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                <ArrowUpRight className="w-3 h-3 mr-0.5" />
+              <span className="text-2xl font-extrabold text-slate-900 tracking-tight">{stat.value}</span>
+              <div className="flex items-center text-[10px] text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
                 <span>{stat.change}</span>
               </div>
             </div>

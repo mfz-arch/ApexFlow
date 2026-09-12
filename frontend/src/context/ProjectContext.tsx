@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Task, Project, User, Activity, TaskStatus, TaskPriority, Comment } from '@/lib/types';
-import { mockTasks, mockProjects, mockUsers, mockActivities } from '@/lib/mockData';
+import { initialTasks, initialProjects, initialUsers, initialActivities } from '@/lib/mockData';
 
 interface ProjectContextType {
   tasks: Task[];
@@ -41,10 +41,10 @@ interface ProjectContextType {
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
-  const [projects] = useState<Project[]>(mockProjects);
-  const [users] = useState<User[]>(mockUsers);
-  const [activities, setActivities] = useState<Activity[]>(mockActivities);
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [projects] = useState<Project[]>(initialProjects);
+  const [users] = useState<User[]>(initialUsers);
+  const [activities, setActivities] = useState<Activity[]>(initialActivities);
   
   const [selectedProjectId, setSelectedProjectId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -54,6 +54,27 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState<boolean>(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
+
+  // Load persisted tasks from LocalStorage on client mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('apexflow_tasks');
+      if (saved) {
+        setTasks(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  // Save tasks to LocalStorage on change
+  useEffect(() => {
+    try {
+      localStorage.setItem('apexflow_tasks', JSON.stringify(tasks));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [tasks]);
 
   // Keyboard shortcut listener for Cmd+K / Ctrl+K
   useEffect(() => {
@@ -85,7 +106,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
 
   const addTask = (taskData: Omit<Task, 'id' | 'code' | 'createdAt' | 'subtasks' | 'comments' | 'timeLoggedHours'>) => {
     const newId = `tsk-${Date.now()}`;
-    const nextNum = tasks.length + 109;
+    const nextNum = tasks.length + 101;
     const newTask: Task = {
       ...taskData,
       id: newId,

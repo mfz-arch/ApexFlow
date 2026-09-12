@@ -8,8 +8,8 @@ import CreateTaskModal from '@/components/task/CreateTaskModal';
 import TaskDetailModal from '@/components/task/TaskDetailModal';
 
 export const metadata: Metadata = {
-  title: 'ApexFlow | Premium Project Management SaaS',
-  description: 'Enterprise-grade project management platform for high-velocity software engineering teams.',
+  title: 'ApexFlow | Modern Clean Project Management SaaS',
+  description: 'Clean, high-performance project management platform for engineering teams.',
 };
 
 export default function RootLayout({
@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-[#080c14] text-slate-100 antialiased bg-mesh min-h-screen flex selection:bg-indigo-500/30 selection:text-indigo-200">
+    <html lang="en">
+      <body className="bg-[#f8fafc] text-slate-900 antialiased bg-mesh min-h-screen flex selection:bg-indigo-500/20 selection:text-indigo-900">
         <ProjectProvider>
           {/* Collapsible Left Sidebar */}
           <Sidebar />
