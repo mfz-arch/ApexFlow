@@ -20,14 +20,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Initialize from LocalStorage
+  // Initialize active user from LocalStorage
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem('apexflow_user');
       if (savedUser) {
         setCurrentUser(JSON.parse(savedUser));
       } else {
-        setCurrentUser(null); // Unauthenticated guest by default
+        setCurrentUser(null);
       }
     } catch (e) {
       console.error('Failed to load user state from localStorage', e);
@@ -37,11 +37,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Persist user on changes
+  // Sync active user to LocalStorage & User DB
   useEffect(() => {
     if (isLoaded) {
       if (currentUser) {
         localStorage.setItem('apexflow_user', JSON.stringify(currentUser));
+        
+        // Save to user DB index
+        try {
+          const dbStr = localStorage.getItem('apexflow_users_db');
+          const usersDb: Record<string, User> = dbStr ? JSON.parse(dbStr) : {};
+          usersDb[currentUser.email.toLowerCase()] = currentUser;
+          localStorage.setItem('apexflow_users_db', JSON.stringify(usersDb));
+        } catch (e) {
+          console.error('Failed to update user database index', e);
+        }
       } else {
         localStorage.removeItem('apexflow_user');
       }
@@ -49,26 +59,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [currentUser, isLoaded]);
 
   const loginStudent = (email: string, name?: string) => {
-    const studentUser: User = {
-      id: `usr-${Date.now()}`,
-      name: name || (email ? email.split('@')[0] : 'Student User'),
-      email: email || 'student@apexflow.edu',
-      role: 'student',
-      xp: currentUser?.xp || 0,
-      level: currentUser?.level || 1,
-      joinedDate: currentUser?.joinedDate || new Date().toISOString().split('T')[0],
-      enrolledCourses: currentUser?.enrolledCourses || [],
-      completedLessons: currentUser?.completedLessons || [],
-      completedCourses: currentUser?.completedCourses || [],
-    };
-    setCurrentUser(studentUser);
+    const cleanEmail = email.trim().toLowerCase();
+    
+    // Check if user exists in LocalStorage DB
+    let existingUser: User | null = null;
+    try {
+      const dbStr = localStorage.getItem('apexflow_users_db');
+      if (dbStr) {
+        const usersDb: Record<string, User> = JSON.parse(dbStr);
+        if (usersDb[cleanEmail]) {
+          existingUser = usersDb[cleanEmail];
+        }
+      }
+    } catch (e) {
+      console.error('Failed to read users database', e);
+    }
+
+    if (existingUser) {
+      setCurrentUser(existingUser);
+    } else {
+      const newStudent: User = {
+        id: `usr-${Date.now()}`,
+        name: name || (cleanEmail ? cleanEmail.split('@')[0] : 'Student User'),
+        email: cleanEmail || 'student@apexflow.edu',
+        role: 'student',
+        xp: 0,
+        level: 1,
+        joinedDate: new Date().toISOString().split('T')[0],
+        enrolledCourses: [],
+        completedLessons: [],
+        completedCourses: [],
+      };
+      setCurrentUser(newStudent);
+    }
   };
 
   const loginAdmin = (email: string): boolean => {
     const adminUser: User = {
       id: 'usr-admin-master',
-      name: 'Academy Administrator',
-      email: email || 'admin@apexflow.edu',
+      name: 'Academy Control Tower',
+      email: email.trim() || 'admin@apexflow.edu',
       role: 'admin',
       xp: 1000,
       level: 10,
@@ -82,19 +112,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const registerStudent = (fullName: string, email: string) => {
-    const newUser: User = {
-      id: `usr-${Date.now()}`,
-      name: fullName.trim(),
-      email: email.trim(),
-      role: 'student',
-      xp: 0,
-      level: 1,
-      joinedDate: new Date().toISOString().split('T')[0],
-      enrolledCourses: [],
-      completedLessons: [],
-      completedCourses: [],
-    };
-    setCurrentUser(newUser);
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = fullName.trim();
+
+    // Check if user already exists
+    let existingUser: User | null = null;
+    try {
+      const dbStr = localStorage.getItem('apexflow_users_db');
+      if (dbStr) {
+        const usersDb: Record<string, User> = JSON.parse(dbStr);
+        if (usersDb[cleanEmail]) {
+          existingUser = usersDb[cleanEmail];
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (existingUser) {
+      setCurrentUser(existingUser);
+    } else {
+      const newUser: User = {
+        id: `usr-${Date.now()}`,
+        name: cleanName,
+        email: cleanEmail,
+        role: 'student',
+        xp: 0,
+        level: 1,
+        joinedDate: new Date().toISOString().split('T')[0],
+        enrolledCourses: [],
+        completedLessons: [],
+        completedCourses: [],
+      };
+      setCurrentUser(newUser);
+    }
   };
 
   const logout = () => {
@@ -153,3 +204,4 @@ export function useAuth() {
   }
   return context;
 }
+
