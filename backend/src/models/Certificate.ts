@@ -8,6 +8,7 @@ export interface ICertificate extends Document {
   courseTitle: string;
   issueDate: string;
   scorePercent: number;
+  status: 'pending' | 'verified' | 'rejected';
 }
 
 const CertificateSchema = new Schema<ICertificate>(
@@ -19,6 +20,7 @@ const CertificateSchema = new Schema<ICertificate>(
     courseTitle: { type: String, required: true },
     issueDate: { type: String, required: true },
     scorePercent: { type: Number, required: true },
+    status: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
   },
   { timestamps: true }
 );

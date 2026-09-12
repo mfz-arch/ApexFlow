@@ -66,6 +66,7 @@ export interface Certificate {
   courseTitle: string;
   issueDate: string;
   scorePercent: number;
+  status: 'pending' | 'verified' | 'rejected';
 }
 
 export interface TestResult {

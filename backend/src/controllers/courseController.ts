@@ -149,6 +149,7 @@ export const submitFinalTest = async (req: AuthRequest, res: Response): Promise<
             day: 'numeric',
           }),
           scorePercent,
+          status: 'pending',
         });
         await newCert.save();
       }

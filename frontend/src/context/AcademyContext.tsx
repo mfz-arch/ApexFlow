@@ -20,6 +20,8 @@ interface AcademyContextType {
   isCourseCompleted: (courseId: string) => boolean;
   getCertificateByCourse: (courseId: string) => Certificate | undefined;
   getCertificateById: (certId: string) => Certificate | undefined;
+  approveCertificate: (certId: string) => void;
+  rejectCertificate: (certId: string) => void;
   lastTestResult: TestResult | null;
   setLastTestResult: (result: TestResult | null) => void;
 }
@@ -139,6 +141,7 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
           courseTitle: course.title,
           issueDate: formatDate(new Date().toISOString()),
           scorePercent,
+          status: 'pending',
         };
         setCertificates((prev) => [newCertificate, ...prev]);
       }
@@ -173,6 +176,18 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
     return certificates.find((c) => c.id === certId);
   };
 
+  const approveCertificate = (certId: string) => {
+    setCertificates((prev) =>
+      prev.map((c) => (c.id === certId ? { ...c, status: 'verified' } : c))
+    );
+  };
+
+  const rejectCertificate = (certId: string) => {
+    setCertificates((prev) =>
+      prev.map((c) => (c.id === certId ? { ...c, status: 'rejected' } : c))
+    );
+  };
+
   return (
     <AcademyContext.Provider
       value={{
@@ -189,6 +204,8 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
         isCourseCompleted,
         getCertificateByCourse,
         getCertificateById,
+        approveCertificate,
+        rejectCertificate,
         lastTestResult,
         setLastTestResult,
       }}

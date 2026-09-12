@@ -16,13 +16,15 @@ import {
   Eye,
   EyeOff,
   User,
-  KeyRound,
+  Clock,
+  Check,
+  XCircle,
 } from 'lucide-react';
 import { useAcademy } from '@/context/AcademyContext';
 import { useAuth } from '@/context/AuthContext';
 
 export default function AdminDashboardPage() {
-  const { courses, certificates, completedCourseIds } = useAcademy();
+  const { courses, certificates, completedCourseIds, approveCertificate, rejectCertificate } = useAcademy();
   const { currentUser, role, loginAdmin } = useAuth();
 
   const [adminName, setAdminName] = useState('Muntasir Ahmed');
@@ -38,6 +40,42 @@ export default function AdminDashboardPage() {
     loginAdmin(adminEmail, adminName);
   };
 
+  const handleApprove = async (certId: string) => {
+    approveCertificate(certId);
+    const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
+    if (token) {
+      try {
+        await fetch(`https://apexflow-backend.onrender.com/api/admin/certificates/${certId}/approve`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      } catch (err) {
+        console.error('Failed to sync approval to backend:', err);
+      }
+    }
+  };
+
+  const handleReject = async (certId: string) => {
+    rejectCertificate(certId);
+    const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
+    if (token) {
+      try {
+        await fetch(`https://apexflow-backend.onrender.com/api/admin/certificates/${certId}/reject`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      } catch (err) {
+        console.error('Failed to sync rejection to backend:', err);
+      }
+    }
+  };
+
   if (!isAdmin) {
     return (
       <div className="-mx-4 sm:-mx-6 lg:-mx-8 -my-8 min-h-[92vh] flex flex-col lg:flex-row font-sans bg-[#0B101D] text-slate-100 relative overflow-hidden">
@@ -45,7 +83,7 @@ export default function AdminDashboardPage() {
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-blue-600/10 via-indigo-600/20 to-transparent rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-indigo-900/30 to-transparent rounded-full blur-2xl pointer-events-none" />
 
-        {/* Left Column - Admin Welcome & Stats Highlights (Matching Screenshot 2) */}
+        {/* Left Column - Admin Welcome & Stats Highlights */}
         <div className="w-full lg:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-between relative z-10">
           <div className="space-y-12">
             {/* Top Logo */}
@@ -76,7 +114,7 @@ export default function AdminDashboardPage() {
                 <span className="text-blue-400">Admin Portal</span>
               </h1>
               <p className="text-sm text-slate-300 font-medium leading-relaxed">
-                Manage your platform, monitor progress, and keep everything running smoothly.
+                Manage your platform, verify student certificates, and keep everything running smoothly.
               </p>
             </div>
 
@@ -93,14 +131,14 @@ export default function AdminDashboardPage() {
                 <div className="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
                   <Users className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-bold text-slate-200">Manage students & courses</span>
+                <span className="text-xs font-bold text-slate-200">Manage real registered students</span>
               </div>
 
               <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md">
                 <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
                   <Award className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-bold text-slate-200">Track certificates & activity</span>
+                <span className="text-xs font-bold text-slate-200">Approve & verify student certificates</span>
               </div>
             </div>
           </div>
@@ -252,38 +290,26 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // Roster of students (current user + sample roster)
-  const studentsList = [
-    {
-      id: currentUser?.id || 'usr-1',
-      name: currentUser?.name || 'Sarah Jenkins',
-      email: currentUser?.email || 'sarah@apexflow.edu',
-      joinedDate: currentUser?.joinedDate || '2026-09-12',
-      enrolledCount: 2,
-      completedCount: completedCourseIds.length,
-      certificatesCount: certificates.filter((c) => c.studentName === (currentUser?.name || 'Sarah Jenkins')).length,
-    },
-    {
-      id: 'usr-2',
-      name: 'Michael Chang',
-      email: 'michael.c@apexflow.edu',
-      joinedDate: '2026-09-10',
-      enrolledCount: 3,
-      completedCount: 1,
-      certificatesCount: 1,
-    },
-    {
-      id: 'usr-3',
-      name: 'Elena Vance',
-      email: 'elena.v@apexflow.edu',
-      joinedDate: '2026-09-08',
-      enrolledCount: 4,
-      completedCount: 2,
-      certificatesCount: 2,
-    },
-  ];
+  // Filter pending vs verified certificates
+  const pendingCertificates = certificates.filter((c) => c.status === 'pending');
+  const verifiedCertificates = certificates.filter((c) => c.status === 'verified');
 
-  const totalCertificatesIssued = certificates.length + 3;
+  // Real roster of students (ONLY real registered users, NO fake mock users like Michael Chang / Elena Vance)
+  const studentsList = currentUser && currentUser.role === 'student'
+    ? [
+        {
+          id: currentUser.id,
+          name: currentUser.name,
+          email: currentUser.email,
+          joinedDate: currentUser.joinedDate || '2026-01-01',
+          enrolledCount: currentUser.enrolledCourses?.length || 0,
+          completedCount: completedCourseIds.length,
+          certificatesCount: verifiedCertificates.filter(
+            (c) => c.studentId === currentUser.id || c.studentName === currentUser.name
+          ).length,
+        },
+      ]
+    : [];
 
   return (
     <div className="space-y-8 pb-12">
@@ -292,11 +318,11 @@ export default function AdminDashboardPage() {
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
             <ShieldCheck className="w-4 h-4" />
-            <span>Administrator Control Center</span>
+            <span>Administrator Control Tower</span>
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight">Apex Flow Academy Analytics</h1>
           <p className="text-xs text-slate-400 font-medium">
-            Monitor real registered students, course completion rates, and issued certificates.
+            Monitor real registered students, verify certificate completion requests, and manage academy activity.
           </p>
         </div>
       </div>
@@ -308,7 +334,7 @@ export default function AdminDashboardPage() {
             <Users className="w-4 h-4 text-indigo-600" /> Registered Students
           </span>
           <div className="text-2xl font-extrabold text-slate-900">{studentsList.length}</div>
-          <span className="text-[11px] text-slate-400 font-medium">Active learner accounts</span>
+          <span className="text-[11px] text-slate-400 font-medium">Active registered accounts</span>
         </div>
 
         <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-1">
@@ -320,24 +346,93 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-1">
-          <span className="text-xs font-bold text-slate-500 flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Completed Courses
+          <span className="text-xs font-bold text-amber-600 flex items-center gap-1.5">
+            <Clock className="w-4 h-4 text-amber-500" /> Pending Requests
           </span>
-          <div className="text-2xl font-extrabold text-slate-900">{completedCourseIds.length + 3}</div>
-          <span className="text-[11px] text-emerald-700 font-medium">Final tests passed</span>
+          <div className="text-2xl font-extrabold text-amber-600">{pendingCertificates.length}</div>
+          <span className="text-[11px] text-amber-700 font-medium">Waiting for verification</span>
         </div>
 
         <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-1">
           <span className="text-xs font-bold text-slate-500 flex items-center gap-1.5">
-            <Award className="w-4 h-4 text-amber-500" /> Certificates Issued
+            <Award className="w-4 h-4 text-emerald-600" /> Verified Certificates
           </span>
-          <div className="text-2xl font-extrabold text-slate-900">{totalCertificatesIssued}</div>
-          <span className="text-[11px] text-amber-700 font-medium">Unique IDs generated</span>
+          <div className="text-2xl font-extrabold text-slate-900">{verifiedCertificates.length}</div>
+          <span className="text-[11px] text-emerald-700 font-medium">Approved & issued credentials</span>
+        </div>
+      </div>
+
+      {/* PENDING CERTIFICATE VERIFICATION REQUESTS */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-amber-500" />
+            Pending Certificate Verification Requests
+          </h2>
+          {pendingCertificates.length > 0 && (
+            <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+              {pendingCertificates.length} Pending Approval
+            </span>
+          )}
+        </div>
+
+        <div className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <th className="p-3.5 pl-5">Certificate ID</th>
+                  <th className="p-3.5">Student Name</th>
+                  <th className="p-3.5">Course Completed</th>
+                  <th className="p-3.5">Final Score</th>
+                  <th className="p-3.5">Date Requested</th>
+                  <th className="p-3.5 text-right pr-5">Admin Verification Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-xs font-semibold">
+                {pendingCertificates.map((cert) => (
+                  <tr key={cert.id} className="hover:bg-amber-50/50 transition-colors">
+                    <td className="p-3.5 pl-5 font-mono text-indigo-700 font-bold">{cert.id}</td>
+                    <td className="p-3.5 text-slate-900 font-bold">{cert.studentName}</td>
+                    <td className="p-3.5 text-slate-700">{cert.courseTitle}</td>
+                    <td className="p-3.5 font-mono text-emerald-700 font-bold">{cert.scorePercent}%</td>
+                    <td className="p-3.5 text-slate-500">{cert.issueDate}</td>
+                    <td className="p-3.5 text-right pr-5">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleApprove(cert.id)}
+                          className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm shadow-emerald-600/20 transition-all flex items-center gap-1.5"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Approve & Issue</span>
+                        </button>
+                        <button
+                          onClick={() => handleReject(cert.id)}
+                          className="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold border border-rose-200 transition-all flex items-center gap-1.5"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>Reject</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {pendingCertificates.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-slate-500 font-medium">
+                      No pending certificate requests right now. When a student completes a course, their verification request will show up here.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       {/* Registered Students Roster Table */}
-      <div className="space-y-4">
+      <div className="space-y-4 pt-4 border-t border-slate-200">
         <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
           <Users className="w-5 h-5 text-indigo-600" />
           Registered Student Roster
@@ -352,7 +447,7 @@ export default function AdminDashboardPage() {
                   <th className="p-3.5">Registration Date</th>
                   <th className="p-3.5">Enrolled Courses</th>
                   <th className="p-3.5">Completed Courses</th>
-                  <th className="p-3.5 text-right pr-5">Certificates Issued</th>
+                  <th className="p-3.5 text-right pr-5">Verified Credentials</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -372,17 +467,25 @@ export default function AdminDashboardPage() {
                     </td>
                   </tr>
                 ))}
+
+                {studentsList.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-slate-500 font-medium">
+                      No active registered student accounts found. Real users will appear here upon registration.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
 
-      {/* Issued Certificates Roster Table */}
+      {/* Issued Digital Certificates Table */}
       <div className="space-y-4 pt-4 border-t border-slate-200">
         <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
           <Award className="w-5 h-5 text-indigo-600" />
-          Issued Digital Certificates
+          Verified Issued Digital Certificates
         </h2>
 
         <div className="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
@@ -394,26 +497,32 @@ export default function AdminDashboardPage() {
                   <th className="p-3.5">Student Name</th>
                   <th className="p-3.5">Course Title</th>
                   <th className="p-3.5">Issue Date</th>
+                  <th className="p-3.5">Status</th>
                   <th className="p-3.5 text-right pr-5">Score</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs font-semibold">
-                {certificates.map((cert) => (
+                {verifiedCertificates.map((cert) => (
                   <tr key={cert.id} className="hover:bg-slate-50 transition-colors">
                     <td className="p-3.5 pl-5 font-mono text-indigo-700 font-bold">{cert.id}</td>
                     <td className="p-3.5 text-slate-900">{cert.studentName}</td>
                     <td className="p-3.5 text-slate-700">{cert.courseTitle}</td>
                     <td className="p-3.5 text-slate-500">{cert.issueDate}</td>
+                    <td className="p-3.5">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
+                        <CheckCircle2 className="w-3 h-3" /> Verified
+                      </span>
+                    </td>
                     <td className="p-3.5 text-right pr-5 font-mono text-emerald-700 font-bold">
                       {cert.scorePercent}%
                     </td>
                   </tr>
                 ))}
 
-                {certificates.length === 0 && (
+                {verifiedCertificates.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-slate-500 font-medium">
-                      No certificates issued yet. Certificates will automatically log here when students pass final assessment tests.
+                    <td colSpan={6} className="p-8 text-center text-slate-500 font-medium">
+                      No verified certificates issued yet. When you approve pending student requests, they will log here.
                     </td>
                   </tr>
                 )}
