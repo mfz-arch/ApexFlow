@@ -94,11 +94,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const loginAdmin = (email: string): boolean => {
+  const loginAdmin = (email: string, name?: string): boolean => {
+    const cleanEmail = email.trim().toLowerCase();
     const adminUser: User = {
       id: 'usr-admin-master',
-      name: 'Academy Control Tower',
-      email: email.trim() || 'admin@apexflow.edu',
+      name: name?.trim() || 'Academy Master Admin',
+      email: cleanEmail || 'admin@apexflow.edu',
       role: 'admin',
       xp: 1000,
       level: 10,

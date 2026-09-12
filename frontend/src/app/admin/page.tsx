@@ -13,6 +13,10 @@ import {
   Mail,
   CheckCircle2,
   BarChart3,
+  Eye,
+  EyeOff,
+  User,
+  KeyRound,
 } from 'lucide-react';
 import { useAcademy } from '@/context/AcademyContext';
 import { useAuth } from '@/context/AuthContext';
@@ -21,14 +25,17 @@ export default function AdminDashboardPage() {
   const { courses, certificates, completedCourseIds } = useAcademy();
   const { currentUser, role, loginAdmin } = useAuth();
 
+  const [adminName, setAdminName] = useState('Muntasir Ahmed');
   const [adminEmail, setAdminEmail] = useState('admin@apexflow.edu');
   const [adminPass, setAdminPass] = useState('');
+  const [showAdminPass, setShowAdminPass] = useState(false);
+  const [isSetupMode, setIsSetupMode] = useState(false);
 
   const isAdmin = role === 'admin';
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    loginAdmin(adminEmail);
+    loginAdmin(adminEmail, adminName);
   };
 
   if (!isAdmin) {
@@ -99,13 +106,19 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Right Column - White Admin Login Form Card (Matching Screenshot 2) */}
+        {/* Right Column - White Admin Login/Setup Form Card */}
         <div className="w-full lg:w-1/2 p-6 sm:p-12 lg:p-16 flex flex-col justify-between relative z-10">
           {/* Top Right Logo */}
           <div className="hidden lg:flex justify-end">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                A
+              <div className="h-8 w-auto bg-white rounded-lg p-0.5 shadow-2xs flex items-center justify-center">
+                <Image
+                  src="/logo.png"
+                  alt="Apex Flow Logo"
+                  width={28}
+                  height={28}
+                  className="h-6 w-auto object-contain"
+                />
               </div>
               <span className="text-xs font-extrabold text-slate-300">Apex Flow</span>
             </div>
@@ -121,14 +134,57 @@ export default function AdminDashboardPage() {
 
               <div className="text-center space-y-1">
                 <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                  Admin Login
+                  {isSetupMode ? 'Create Master Admin Account' : 'Admin Login'}
                 </h2>
                 <p className="text-xs text-slate-500 font-medium">
-                  Secure access for platform administrators.
+                  {isSetupMode
+                    ? 'Set up your unique Administrator Master credentials for the platform.'
+                    : 'Secure access for platform administrators.'}
                 </p>
               </div>
 
-              <form onSubmit={handleAdminLogin} className="space-y-4 pt-2">
+              {/* Mode Toggle Switch */}
+              <div className="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setIsSetupMode(false)}
+                  className={`flex-1 py-2 rounded-lg transition-colors ${
+                    !isSetupMode ? 'bg-white text-indigo-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Admin Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSetupMode(true)}
+                  className={`flex-1 py-2 rounded-lg transition-colors ${
+                    isSetupMode ? 'bg-white text-indigo-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Create Admin Setup
+                </button>
+              </div>
+
+              <form onSubmit={handleAdminLogin} className="space-y-4 pt-1">
+                {isSetupMode && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Administrator Full Name
+                    </label>
+                    <div className="relative">
+                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                      <input
+                        type="text"
+                        required
+                        value={adminName}
+                        onChange={(e) => setAdminName(e.target.value)}
+                        placeholder="e.g. Muntasir Ahmed"
+                        className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">
                     Email address
@@ -140,7 +196,7 @@ export default function AdminDashboardPage() {
                       required
                       value={adminEmail}
                       onChange={(e) => setAdminEmail(e.target.value)}
-                      placeholder="admin@example.com"
+                      placeholder="admin@apexflow.edu"
                       className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all"
                     />
                   </div>
@@ -153,13 +209,20 @@ export default function AdminDashboardPage() {
                   <div className="relative">
                     <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                     <input
-                      type="password"
+                      type={showAdminPass ? 'text' : 'password'}
                       required
                       value={adminPass}
                       onChange={(e) => setAdminPass(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all"
+                      className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-10 py-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowAdminPass(!showAdminPass)}
+                      className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
+                    >
+                      {showAdminPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
 
@@ -167,7 +230,8 @@ export default function AdminDashboardPage() {
                   type="submit"
                   className="w-full py-3.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2"
                 >
-                  <span>Sign In</span>
+                  <span>{isSetupMode ? 'Create & Access Control Center' : 'Sign In'}</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
 
