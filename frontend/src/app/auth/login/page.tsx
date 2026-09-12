@@ -29,7 +29,7 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    loginStudent(email || 'student@apexflow.edu');
+    loginStudent(email);
     router.push('/dashboard');
   };
 
@@ -221,7 +221,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => {
-                  loginStudent('google.student@apexflow.edu', 'Alex Vance');
+                  loginStudent('student@example.com', 'Registered Learner');
                   router.push('/dashboard');
                 }}
                 className="w-full py-3 px-4 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-all flex items-center justify-center gap-2"

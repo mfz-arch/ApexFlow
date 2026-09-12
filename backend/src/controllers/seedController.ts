@@ -663,12 +663,12 @@ const initialCourses = [
 export const seedDatabase = async (req: Request, res: Response): Promise<void> => {
   try {
     // 1. Seed Master Admin
-    const adminEmail = 'admin@apexflow.edu';
+    const adminEmail = 'aimfizahmed7@gmail.com';
     let admin = await User.findOne({ email: adminEmail });
     if (!admin) {
       const hashedPassword = await bcrypt.hash('ApexFlow2026!', 10);
       admin = new User({
-        name: 'Academy Control Tower',
+        name: "AIM'FIZ AHMED IBRAHIM",
         email: adminEmail,
         password: hashedPassword,
         role: 'admin',
