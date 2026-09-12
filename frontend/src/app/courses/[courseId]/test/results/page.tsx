@@ -121,13 +121,13 @@ export default function TestResultsPage() {
 
         {/* Action CTAs */}
         <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-          {passed && lastTestResult.certificateId && (
+          {passed && (
             <Link
-              href={`/certificates/${lastTestResult.certificateId}`}
+              href="/certificates"
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2"
             >
-              <GraduationCap className="w-4 h-4" />
-              <span>View Official Certificate</span>
+              <Award className="w-4 h-4" />
+              <span>Send Certificate Request</span>
             </Link>
           )}
 

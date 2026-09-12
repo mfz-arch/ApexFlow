@@ -31,7 +31,6 @@ export default function AdminDashboardPage() {
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPass, setAdminPass] = useState('');
   const [showAdminPass, setShowAdminPass] = useState(false);
-  const [isSetupMode, setIsSetupMode] = useState(false);
 
   const isAdmin = role === 'admin';
 
@@ -172,56 +171,14 @@ export default function AdminDashboardPage() {
 
               <div className="text-center space-y-1">
                 <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                  {isSetupMode ? 'Create Master Admin Account' : 'Admin Login'}
+                  Admin Sign In
                 </h2>
                 <p className="text-xs text-slate-500 font-medium">
-                  {isSetupMode
-                    ? 'Set up your unique Administrator Master credentials for the platform.'
-                    : 'Secure access for platform administrators.'}
+                  Secure access for platform administrators.
                 </p>
               </div>
 
-              {/* Mode Toggle Switch */}
-              <div className="flex rounded-xl bg-slate-100 p-1 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setIsSetupMode(false)}
-                  className={`flex-1 py-2 rounded-lg transition-colors ${
-                    !isSetupMode ? 'bg-white text-indigo-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  Admin Sign In
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsSetupMode(true)}
-                  className={`flex-1 py-2 rounded-lg transition-colors ${
-                    isSetupMode ? 'bg-white text-indigo-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  Create Admin Setup
-                </button>
-              </div>
-
               <form onSubmit={handleAdminLogin} className="space-y-4 pt-1">
-                {isSetupMode && (
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      Administrator Full Name
-                    </label>
-                    <div className="relative">
-                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                      <input
-                        type="text"
-                        required
-                        value={adminName}
-                        onChange={(e) => setAdminName(e.target.value)}
-                        placeholder="AIM'FIZ AHMED IBRAHIM"
-                        className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all"
-                      />
-                    </div>
-                  </div>
-                )}
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">
@@ -268,7 +225,7 @@ export default function AdminDashboardPage() {
                   type="submit"
                   className="w-full py-3.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2"
                 >
-                  <span>{isSetupMode ? 'Create & Access Control Center' : 'Sign In'}</span>
+                  <span>Sign In</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
