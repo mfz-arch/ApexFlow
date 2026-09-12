@@ -27,8 +27,8 @@ export default function AdminDashboardPage() {
   const { courses, certificates, completedCourseIds, approveCertificate, rejectCertificate } = useAcademy();
   const { currentUser, role, loginAdmin } = useAuth();
 
-  const [adminName, setAdminName] = useState('Muntasir Ahmed');
-  const [adminEmail, setAdminEmail] = useState('admin@apexflow.edu');
+  const [adminName, setAdminName] = useState("AIM'FIZ AHMED IBRAHIM");
+  const [adminEmail, setAdminEmail] = useState('');
   const [adminPass, setAdminPass] = useState('');
   const [showAdminPass, setShowAdminPass] = useState(false);
   const [isSetupMode, setIsSetupMode] = useState(false);
@@ -216,7 +216,7 @@ export default function AdminDashboardPage() {
                         required
                         value={adminName}
                         onChange={(e) => setAdminName(e.target.value)}
-                        placeholder="e.g. Muntasir Ahmed"
+                        placeholder="AIM'FIZ AHMED IBRAHIM"
                         className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all"
                       />
                     </div>
@@ -234,7 +234,7 @@ export default function AdminDashboardPage() {
                       required
                       value={adminEmail}
                       onChange={(e) => setAdminEmail(e.target.value)}
-                      placeholder="admin@apexflow.edu"
+                      placeholder="aimfizahmed7@gmail.com"
                       className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all"
                     />
                   </div>

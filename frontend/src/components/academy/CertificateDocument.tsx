@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Certificate } from '@/lib/types';
-import { GraduationCap, Award, Printer, ShieldCheck, Download, Sparkles } from 'lucide-react';
+import { Award, Printer, ShieldCheck } from 'lucide-react';
 
 export default function CertificateDocument({ certificate }: { certificate: Certificate }) {
   const handlePrint = () => {
@@ -43,8 +44,14 @@ export default function CertificateDocument({ certificate }: { certificate: Cert
 
         {/* Certificate Branding Header */}
         <div className="flex flex-col items-center justify-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 mb-2">
-            <GraduationCap className="w-8 h-8" />
+          <div className="h-16 w-auto bg-white rounded-2xl p-2 shadow-md flex items-center justify-center border border-slate-100 mb-1">
+            <Image
+              src="/logo.png"
+              alt="Apex Flow Logo"
+              width={56}
+              height={56}
+              className="h-12 w-auto object-contain"
+            />
           </div>
           <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
             Apex Flow Online Learning Academy
@@ -100,10 +107,25 @@ export default function CertificateDocument({ certificate }: { certificate: Cert
           </div>
         </div>
 
-        {/* Professional Footer Seal Statement */}
-        <div className="pt-4 flex items-center justify-center gap-2 text-[11px] text-slate-500 font-medium border-t border-slate-100 max-w-xl mx-auto">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-          <span>Verified by Apex Flow Academic Engine • Unique Digital Credential</span>
+        {/* Professional Footer Seal & Founder Verification Statement */}
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 max-w-2xl mx-auto gap-4 text-left">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="block font-bold text-slate-400 uppercase tracking-widest text-[9px]">
+                Verified by the Founder
+              </span>
+              <span className="font-extrabold text-slate-900 text-xs tracking-tight">
+                AIM&apos;FIZ AHMED IBRAHIM
+              </span>
+            </div>
+          </div>
+
+          <div className="text-[10px] text-slate-400 font-medium text-center sm:text-right">
+            <span>Verified by Apex Flow Academic Engine • Unique Digital Credential</span>
+          </div>
         </div>
       </div>
     </div>

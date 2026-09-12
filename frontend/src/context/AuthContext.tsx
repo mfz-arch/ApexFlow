@@ -95,11 +95,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const loginAdmin = (email: string, name?: string): boolean => {
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanEmail = email ? email.trim().toLowerCase() : '';
     const adminUser: User = {
       id: 'usr-admin-master',
-      name: name?.trim() || 'Academy Master Admin',
-      email: cleanEmail || 'admin@apexflow.edu',
+      name: name?.trim() || "AIM'FIZ AHMED IBRAHIM",
+      email: cleanEmail || 'aimfizahmed7@gmail.com',
       role: 'admin',
       xp: 1000,
       level: 10,
@@ -151,6 +151,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('apexflow_user');
+    localStorage.removeItem('apexflow_token');
+    localStorage.removeItem('token');
     setCurrentUser(null);
   };
 

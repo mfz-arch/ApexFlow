@@ -37,36 +37,39 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
   const [completedCourseIds, setCompletedCourseIds] = useState<string[]>([]);
   const [lastTestResult, setLastTestResult] = useState<TestResult | null>(null);
 
-  // Sync state from LocalStorage on mount
+  // Sync state with active user
   useEffect(() => {
     try {
       const savedCerts = localStorage.getItem('apexflow_certificates');
       if (savedCerts) setCertificates(JSON.parse(savedCerts));
 
-      const savedEnrolled = localStorage.getItem('apexflow_enrolled');
-      if (savedEnrolled) setEnrolledCourseIds(JSON.parse(savedEnrolled));
-
-      const savedLessons = localStorage.getItem('apexflow_completed_lessons');
-      if (savedLessons) setCompletedLessonIds(JSON.parse(savedLessons));
-
-      const savedCourses = localStorage.getItem('apexflow_completed_courses');
-      if (savedCourses) setCompletedCourseIds(JSON.parse(savedCourses));
+      if (currentUser) {
+        setEnrolledCourseIds(currentUser.enrolledCourses || []);
+        setCompletedLessonIds(currentUser.completedLessons || []);
+        setCompletedCourseIds(currentUser.completedCourses || []);
+      } else {
+        setEnrolledCourseIds([]);
+        setCompletedLessonIds([]);
+        setCompletedCourseIds([]);
+      }
     } catch (e) {
       console.error(e);
     }
-  }, []);
+  }, [currentUser]);
 
   // Save changes to LocalStorage
   useEffect(() => {
     try {
       localStorage.setItem('apexflow_certificates', JSON.stringify(certificates));
-      localStorage.setItem('apexflow_enrolled', JSON.stringify(enrolledCourseIds));
-      localStorage.setItem('apexflow_completed_lessons', JSON.stringify(completedLessonIds));
-      localStorage.setItem('apexflow_completed_courses', JSON.stringify(completedCourseIds));
+      if (currentUser) {
+        localStorage.setItem('apexflow_enrolled', JSON.stringify(enrolledCourseIds));
+        localStorage.setItem('apexflow_completed_lessons', JSON.stringify(completedLessonIds));
+        localStorage.setItem('apexflow_completed_courses', JSON.stringify(completedCourseIds));
+      }
     } catch (e) {
       console.error(e);
     }
-  }, [certificates, enrolledCourseIds, completedLessonIds, completedCourseIds]);
+  }, [certificates, enrolledCourseIds, completedLessonIds, completedCourseIds, currentUser]);
 
   const enrollInCourse = (courseId: string) => {
     if (!enrolledCourseIds.includes(courseId)) {
