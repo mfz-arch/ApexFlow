@@ -74,9 +74,10 @@ const startServer = async () => {
       await seedDatabase(reqMock, resMock);
     }
 
-    app.listen(PORT, () => {
-      console.log(`🚀 [Apex Flow Backend] Server running on port ${PORT}`);
-      console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
+    const portNum = Number(PORT) || 5000;
+    app.listen(portNum, '0.0.0.0', () => {
+      console.log(`🚀 [Apex Flow Backend] Server running on port ${portNum}`);
+      console.log(`🌐 Health check: http://0.0.0.0:${portNum}/api/health`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
