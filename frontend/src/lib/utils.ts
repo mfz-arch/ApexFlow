@@ -1,57 +1,46 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { TaskPriority, TaskStatus } from './types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getPriorityBadge(priority: TaskPriority) {
-  switch (priority) {
-    case 'urgent':
-      return {
-        label: 'Urgent',
-        bg: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-        dot: 'bg-rose-500',
-      };
-    case 'high':
-      return {
-        label: 'High',
-        bg: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-        dot: 'bg-amber-500',
-      };
-    case 'medium':
-      return {
-        label: 'Medium',
-        bg: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-        dot: 'bg-blue-500',
-      };
-    case 'low':
-    default:
-      return {
-        label: 'Low',
-        bg: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
-        dot: 'bg-slate-400',
-      };
-  }
+/**
+ * Generate a unique Certificate ID format: AF-2026-XXXXX
+ */
+export function generateCertificateId(): string {
+  const randomNum = Math.floor(10000 + Math.random() * 90000);
+  return `AF-2026-${randomNum}`;
 }
 
-export function getStatusDetails(status: TaskStatus) {
-  switch (status) {
-    case 'backlog':
-      return { label: 'Backlog', color: 'text-slate-400', bg: 'bg-slate-500/10' };
-    case 'todo':
-      return { label: 'To Do', color: 'text-indigo-400', bg: 'bg-indigo-500/10' };
-    case 'in_progress':
-      return { label: 'In Progress', color: 'text-amber-400', bg: 'bg-amber-500/10' };
-    case 'in_review':
-      return { label: 'In Review', color: 'text-purple-400', bg: 'bg-purple-500/10' };
-    case 'done':
-      return { label: 'Done', color: 'text-emerald-400', bg: 'bg-emerald-500/10' };
-  }
-}
-
-export function formatDate(dateString: string) {
-  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+export function formatDate(dateString: string): string {
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
   return new Date(dateString).toLocaleDateString('en-US', options);
+}
+
+export function calculateLevel(xp: number): number {
+  return Math.floor(xp / 100) + 1;
+}
+
+export function getCategoryBadgeColor(category: string): string {
+  switch (category.toLowerCase()) {
+    case 'programming':
+      return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+    case 'languages':
+      return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    case 'mathematics':
+      return 'bg-blue-50 text-blue-700 border-blue-200';
+    case 'databases':
+      return 'bg-amber-50 text-amber-700 border-amber-200';
+    case 'networking':
+      return 'bg-purple-50 text-purple-700 border-purple-200';
+    case 'ai & data science':
+      return 'bg-teal-50 text-teal-700 border-teal-200';
+    default:
+      return 'bg-slate-50 text-slate-700 border-slate-200';
+  }
 }

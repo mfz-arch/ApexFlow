@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { ProjectProvider } from '@/context/ProjectContext';
-import Sidebar from '@/components/layout/Sidebar';
-import TopHeader from '@/components/layout/TopHeader';
-import CommandPalette from '@/components/layout/CommandPalette';
-import CreateTaskModal from '@/components/task/CreateTaskModal';
-import TaskDetailModal from '@/components/task/TaskDetailModal';
+import { AuthProvider } from '@/context/AuthContext';
+import { AcademyProvider } from '@/context/AcademyContext';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'ApexFlow | Modern Clean Project Management SaaS',
-  description: 'Clean, high-performance project management platform for engineering teams.',
+  title: 'Apex Flow | Online Learning Academy',
+  description: 'Learn programming, languages, math, databases, networking, and machine learning with step-by-step interactive lessons and verified certificates.',
 };
 
 export default function RootLayout({
@@ -19,22 +17,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-[#f8fafc] text-slate-900 antialiased bg-mesh min-h-screen flex selection:bg-indigo-500/20 selection:text-indigo-900">
-        <ProjectProvider>
-          {/* Collapsible Left Sidebar */}
-          <Sidebar />
-
-          {/* Main App Content View Area */}
-          <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
-            <TopHeader />
-            <main className="flex-1 overflow-y-auto p-6">{children}</main>
-          </div>
-
-          {/* Interactive Drawers & Overlays */}
-          <CommandPalette />
-          <CreateTaskModal />
-          <TaskDetailModal />
-        </ProjectProvider>
+      <body className="bg-[#f8fafc] text-slate-900 antialiased min-h-screen flex flex-col selection:bg-indigo-500/20 selection:text-indigo-900">
+        <AuthProvider>
+          <AcademyProvider>
+            <Navbar />
+            <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              {children}
+            </main>
+            <Footer />
+          </AcademyProvider>
+        </AuthProvider>
       </body>
     </html>
   );

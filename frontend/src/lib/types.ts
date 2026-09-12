@@ -1,78 +1,80 @@
-export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
-
-export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'in_review' | 'done';
+export type UserRole = 'student' | 'admin';
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  avatar: string;
-  role: string;
-  status: 'online' | 'busy' | 'offline';
+  role: UserRole;
+  xp: number;
+  level: number;
+  joinedDate: string;
+  enrolledCourses: string[]; // course IDs
+  completedLessons: string[]; // lesson IDs
+  completedCourses: string[]; // course IDs
 }
 
-export interface Subtask {
+export type QuestionType = 'multiple_choice' | 'true_false';
+
+export interface Question {
+  id: string;
+  type: QuestionType;
+  questionText: string;
+  options: string[]; // For true_false, options will be ["True", "False"]
+  correctAnswer: number; // 0-indexed position in options array
+  explanation?: string;
+}
+
+export interface PracticeQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+}
+
+export interface Lesson {
+  id: string;
+  courseId: string;
+  title: string;
+  order: number;
+  summary: string;
+  explanation: string;
+  keyPoints: string[];
+  exampleCode?: string;
+  practiceQuestion?: PracticeQuestion;
+  xpReward: number;
+}
+
+export interface Course {
   id: string;
   title: string;
-  completed: boolean;
-}
-
-export interface Comment {
-  id: string;
-  userId: string;
-  userName: string;
-  userAvatar: string;
-  content: string;
-  createdAt: string;
-}
-
-export interface Task {
-  id: string;
-  code: string; // e.g. APEX-101
-  title: string;
+  slug: string;
   description: string;
-  status: TaskStatus;
-  priority: TaskPriority;
-  assignee: User;
-  tags: string[];
-  dueDate: string;
-  subtasks: Subtask[];
-  comments: Comment[];
-  timeLoggedHours: number;
-  estimatedHours: number;
-  projectId: string;
-  createdAt: string;
-}
-
-export interface Project {
-  id: string;
-  name: string;
-  key: string;
-  description: string;
-  color: string;
+  iconName: string;
   category: string;
-  memberCount: number;
-  taskCount: number;
-  completedTaskCount: number;
-  updatedAt: string;
+  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  estimatedHours: string;
+  lessons: Lesson[];
+  questions: Question[];
+  passingScorePercent: number;
 }
 
-export interface Activity {
-  id: string;
-  userId: string;
-  userName: string;
-  userAvatar: string;
-  action: string;
-  target: string;
-  timestamp: string;
+export interface Certificate {
+  id: string; // Format: AF-2026-XXXXX
+  studentId: string;
+  studentName: string;
+  courseId: string;
+  courseTitle: string;
+  issueDate: string;
+  scorePercent: number;
 }
 
-export interface AnalyticsMetrics {
-  totalTasks: number;
-  completedTasks: number;
-  inProgressTasks: number;
-  urgentTasks: number;
-  completionRate: number;
-  sprintVelocity: number;
-  hoursSpent: number;
+export interface TestResult {
+  courseId: string;
+  scorePercent: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  timeSpentSeconds: number;
+  passed: boolean;
+  xpEarned: number;
+  certificateId?: string;
 }
