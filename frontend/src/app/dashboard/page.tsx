@@ -12,22 +12,59 @@ import {
   Sparkles,
   Layers,
   Plus,
+  LogIn,
+  UserPlus,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useAcademy } from '@/context/AcademyContext';
 import CourseCard from '@/components/academy/CourseCard';
 
 export default function DashboardPage() {
-  const { currentUser } = useAuth();
+  const { currentUser, isLoggedIn } = useAuth();
   const { courses, certificates, enrolledCourseIds, completedLessonIds, completedCourseIds } = useAcademy();
 
-  const studentName = currentUser?.name || 'Student';
-  const xp = currentUser?.xp || 0;
+  if (!isLoggedIn || !currentUser) {
+    return (
+      <div className="max-w-md mx-auto py-12 text-center space-y-6">
+        <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+            <GraduationCap className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold text-slate-900">Student Account Required</h2>
+            <p className="text-xs text-slate-500 font-medium">
+              Please sign in or register a student account to view your personal dashboard, track lesson progress, and earn certificates.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 pt-2">
+            <Link
+              href="/auth/login"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold text-xs hover:bg-slate-50 transition-colors flex items-center justify-center gap-1.5"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </Link>
+            <Link
+              href="/auth/register"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-1.5"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Register Free</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const studentName = currentUser.name;
+  const xp = currentUser.xp || 0;
   const level = Math.floor(xp / 100) + 1;
 
-  // Enrolled courses filter
   const enrolledCourses = courses.filter((c) => enrolledCourseIds.includes(c.id));
-  const earnedCertificates = certificates.filter((cert) => cert.studentName === studentName || cert.studentId === currentUser?.id);
+  const earnedCertificates = certificates.filter(
+    (cert) => cert.studentName === studentName || cert.studentId === currentUser.id
+  );
 
   return (
     <div className="space-y-8 pb-12">

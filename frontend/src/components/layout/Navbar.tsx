@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -10,19 +10,21 @@ import {
   LayoutDashboard,
   ShieldCheck,
   Zap,
-  UserCheck,
   LogOut,
   ChevronDown,
+  UserPlus,
+  LogIn,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { currentUser, role, setRole, logout } = useAuth();
-  const [userDropdown, setUserDropdown] = React.useState(false);
+  const { currentUser, role, isLoggedIn, logout } = useAuth();
+  const [userDropdown, setUserDropdown] = useState(false);
 
   const isStudent = role === 'student';
+  const isAdmin = role === 'admin';
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
@@ -87,7 +89,7 @@ export default function Navbar() {
             </>
           )}
 
-          {!isStudent && (
+          {isAdmin && (
             <Link
               href="/admin"
               className={cn(
@@ -105,47 +107,30 @@ export default function Navbar() {
 
         {/* Right Actions & User Menu */}
         <div className="flex items-center gap-3">
-          {/* Role Switcher Button for Testing */}
-          <div className="hidden sm:flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold">
-            <button
-              onClick={() => setRole('student')}
-              className={cn(
-                'px-2.5 py-1 rounded-lg transition-colors',
-                role === 'student' ? 'bg-white text-indigo-700 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
-              )}
-            >
-              Student
-            </button>
-            <button
-              onClick={() => setRole('admin')}
-              className={cn(
-                'px-2.5 py-1 rounded-lg transition-colors',
-                role === 'admin' ? 'bg-white text-emerald-700 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
-              )}
-            >
-              Admin
-            </button>
-          </div>
-
-          {/* XP Badge */}
-          {currentUser && role === 'student' && (
+          {/* XP Badge for Students */}
+          {isStudent && currentUser && (
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-extrabold shadow-2xs">
               <Zap className="w-4 h-4 fill-amber-400 text-amber-500" />
               <span>{currentUser.xp} XP</span>
             </div>
           )}
 
-          {/* User Profile */}
-          {currentUser ? (
+          {/* User Menu or Auth CTA Buttons */}
+          {isLoggedIn && currentUser ? (
             <div className="relative">
               <button
                 onClick={() => setUserDropdown(!userDropdown)}
                 className="flex items-center gap-2 p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
               >
-                <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                <div
+                  className={cn(
+                    'w-7 h-7 rounded-lg text-white flex items-center justify-center font-bold text-xs shadow-2xs',
+                    isAdmin ? 'bg-emerald-600' : 'bg-indigo-600'
+                  )}
+                >
                   {currentUser.name.charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden md:inline text-xs font-bold text-slate-800 truncate max-w-[120px]">
+                <span className="hidden md:inline text-xs font-bold text-slate-800 truncate max-w-[130px]">
                   {currentUser.name}
                 </span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
@@ -156,18 +141,23 @@ export default function Navbar() {
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 mb-1">
                     <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
                     <p className="text-[11px] text-slate-500 truncate">{currentUser.email}</p>
-                    <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 mt-1 rounded bg-indigo-50 text-indigo-700">
-                      {role}
+                    <span
+                      className={cn(
+                        'inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 mt-1 rounded',
+                        isAdmin ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                      )}
+                    >
+                      {isAdmin ? 'Administrator' : 'Student'}
                     </span>
                   </div>
 
                   <Link
-                    href={role === 'admin' ? '/admin' : '/dashboard'}
+                    href={isAdmin ? '/admin' : '/dashboard'}
                     onClick={() => setUserDropdown(false)}
                     className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50"
                   >
                     <LayoutDashboard className="w-4 h-4 text-slate-400" />
-                    <span>{role === 'admin' ? 'Admin Dashboard' : 'Student Dashboard'}</span>
+                    <span>{isAdmin ? 'Admin Dashboard' : 'Student Dashboard'}</span>
                   </Link>
 
                   <button
@@ -184,12 +174,22 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            <Link
-              href="/auth/login"
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition-all"
-            >
-              Sign In
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/auth/login"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign In</span>
+              </Link>
+              <Link
+                href="/auth/register"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Register Free</span>
+              </Link>
+            </div>
           )}
         </div>
       </div>

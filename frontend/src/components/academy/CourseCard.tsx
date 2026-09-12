@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Code,
   BookOpen,
@@ -15,9 +16,12 @@ import {
 } from 'lucide-react';
 import { Course } from '@/lib/types';
 import { useAcademy } from '@/context/AcademyContext';
+import { useAuth } from '@/context/AuthContext';
 import { cn, getCategoryBadgeColor } from '@/lib/utils';
 
 export default function CourseCard({ course }: { course: Course }) {
+  const router = useRouter();
+  const { isLoggedIn } = useAuth();
   const { getCourseProgress, isCourseCompleted } = useAcademy();
   const progress = getCourseProgress(course.id);
   const isCompleted = isCourseCompleted(course.id);
@@ -43,6 +47,13 @@ export default function CourseCard({ course }: { course: Course }) {
 
   const IconComponent = getIcon();
   const categoryBadge = getCategoryBadgeColor(course.category);
+
+  const handleAction = (e: React.MouseEvent) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      router.push(`/auth/register?message=Please create an account to start ${encodeURIComponent(course.title)}.`);
+    }
+  };
 
   return (
     <div className="rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all duration-200 p-6 flex flex-col justify-between space-y-4 group">
@@ -87,7 +98,7 @@ export default function CourseCard({ course }: { course: Course }) {
         </div>
 
         {/* Progress Bar (If started) */}
-        {progress > 0 && (
+        {isLoggedIn && progress > 0 && (
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[11px] font-semibold">
               <span className="text-slate-600">Course Progress</span>
@@ -108,6 +119,7 @@ export default function CourseCard({ course }: { course: Course }) {
         {/* CTA Button */}
         <Link
           href={`/courses/${course.id}`}
+          onClick={handleAction}
           className={cn(
             'w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-2xs',
             isCompleted

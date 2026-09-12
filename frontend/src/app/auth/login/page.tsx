@@ -3,43 +3,45 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GraduationCap, Mail, Lock, ArrowRight, ShieldCheck, UserCheck } from 'lucide-react';
+import { GraduationCap, Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { loginStudent, loginAdmin } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login(email || 'student@apexflow.edu');
-    router.push('/dashboard');
-  };
-
-  const handleDemoStudent = () => {
-    login('alex.student@apexflow.edu', 'Alex Vance', 'student');
-    router.push('/dashboard');
-  };
-
-  const handleDemoAdmin = () => {
-    login('admin@apexflow.edu', 'Academy Administrator', 'admin');
-    router.push('/admin');
+    if (isAdminLogin || email.toLowerCase().includes('admin')) {
+      loginAdmin(email || 'admin@apexflow.edu');
+      router.push('/admin');
+    } else {
+      loginStudent(email || 'student@apexflow.edu');
+      router.push('/dashboard');
+    }
   };
 
   return (
     <div className="max-w-md mx-auto py-8 sm:py-12 space-y-6">
       <div className="text-center space-y-2">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-indigo-600/20">
-          <GraduationCap className="w-7 h-7" />
+        <div
+          className={`w-12 h-12 rounded-2xl text-white flex items-center justify-center mx-auto shadow-lg ${
+            isAdminLogin ? 'bg-emerald-600 shadow-emerald-600/20' : 'bg-indigo-600 shadow-indigo-600/20'
+          }`}
+        >
+          {isAdminLogin ? <ShieldCheck className="w-7 h-7" /> : <GraduationCap className="w-7 h-7" />}
         </div>
         <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          Sign In to Apex Flow
+          {isAdminLogin ? 'Admin Sign In' : 'Student Sign In'}
         </h1>
         <p className="text-xs text-slate-500 font-medium">
-          Access your courses, dashboard, and verified certificates.
+          {isAdminLogin
+            ? 'Access the Academy administrator control panel.'
+            : 'Access your learning roadmap, dashboard, and verified certificates.'}
         </p>
       </div>
 
@@ -54,7 +56,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="student@example.com"
+              placeholder={isAdminLogin ? 'admin@apexflow.edu' : 'student@example.com'}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white"
             />
           </div>
@@ -75,40 +77,27 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2"
+            className={`w-full py-3 px-4 rounded-xl text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 ${
+              isAdminLogin
+                ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
+                : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/20'
+            }`}
           >
-            <span>Sign In to Dashboard</span>
+            <span>{isAdminLogin ? 'Access Admin Dashboard' : 'Sign In to Dashboard'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        {/* Demo Fast Logins for Testing */}
-        <div className="pt-4 border-t border-slate-100 space-y-2">
-          <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 text-center">
-            Or Quick Test Access
-          </span>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={handleDemoStudent}
-              className="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-            >
-              <UserCheck className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Student Mode</span>
-            </button>
-            <button
-              onClick={handleDemoAdmin}
-              className="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Admin Mode</span>
-            </button>
-          </div>
-        </div>
+        <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+          <button
+            onClick={() => setIsAdminLogin(!isAdminLogin)}
+            className="text-slate-500 hover:text-slate-900 transition-colors"
+          >
+            {isAdminLogin ? '← Switch to Student Sign In' : 'Sign In as Administrator →'}
+          </button>
 
-        <div className="pt-2 text-center text-xs text-slate-500 font-medium">
-          Don't have an account yet?{' '}
-          <Link href="/auth/register" className="font-bold text-indigo-600 hover:underline">
-            Register here
+          <Link href="/auth/register" className="text-indigo-600 hover:underline">
+            Register Student Account
           </Link>
         </div>
       </div>

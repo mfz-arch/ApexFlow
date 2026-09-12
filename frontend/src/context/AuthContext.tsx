@@ -5,46 +5,19 @@ import { User, UserRole } from '@/lib/types';
 
 interface AuthContextType {
   currentUser: User | null;
-  role: UserRole;
+  role: UserRole | null;
   isLoggedIn: boolean;
-  login: (email: string, name?: string, role?: UserRole) => void;
-  register: (fullName: string, email: string) => void;
+  loginStudent: (email: string, name?: string) => void;
+  loginAdmin: (email: string, password?: string) => boolean;
+  registerStudent: (fullName: string, email: string) => void;
   logout: () => void;
-  setRole: (role: UserRole) => void;
   updateUserStats: (xpGained: number, completedLessonId?: string, completedCourseId?: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const DEFAULT_STUDENT: User = {
-  id: 'usr-student-demo',
-  name: 'Student User',
-  email: 'student@apexflow.edu',
-  role: 'student',
-  xp: 0,
-  level: 1,
-  joinedDate: new Date().toISOString().split('T')[0],
-  enrolledCourses: [],
-  completedLessons: [],
-  completedCourses: [],
-};
-
-const DEFAULT_ADMIN: User = {
-  id: 'usr-admin-demo',
-  name: 'Academy Administrator',
-  email: 'admin@apexflow.edu',
-  role: 'admin',
-  xp: 500,
-  level: 5,
-  joinedDate: '2026-01-01',
-  enrolledCourses: [],
-  completedLessons: [],
-  completedCourses: [],
-};
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [role, setRoleState] = useState<UserRole>('student');
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Initialize from LocalStorage
@@ -52,16 +25,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const savedUser = localStorage.getItem('apexflow_user');
       if (savedUser) {
-        const parsed = JSON.parse(savedUser);
-        setCurrentUser(parsed);
-        setRoleState(parsed.role || 'student');
+        setCurrentUser(JSON.parse(savedUser));
       } else {
-        // Default guest/student start
-        setCurrentUser(DEFAULT_STUDENT);
+        setCurrentUser(null); // Unauthenticated guest by default
       }
     } catch (e) {
       console.error('Failed to load user state from localStorage', e);
-      setCurrentUser(DEFAULT_STUDENT);
+      setCurrentUser(null);
     } finally {
       setIsLoaded(true);
     }
@@ -69,35 +39,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Persist user on changes
   useEffect(() => {
-    if (isLoaded && currentUser) {
-      localStorage.setItem('apexflow_user', JSON.stringify(currentUser));
+    if (isLoaded) {
+      if (currentUser) {
+        localStorage.setItem('apexflow_user', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('apexflow_user');
+      }
     }
   }, [currentUser, isLoaded]);
 
-  const login = (email: string, name?: string, loginRole: UserRole = 'student') => {
-    if (loginRole === 'admin') {
-      const adminUser: User = { ...DEFAULT_ADMIN, role: 'admin' };
-      setCurrentUser(adminUser);
-      setRoleState('admin');
-    } else {
-      const studentUser: User = {
-        id: `usr-${Date.now()}`,
-        name: name || (email ? email.split('@')[0] : 'Student User'),
-        email: email || 'student@apexflow.edu',
-        role: 'student',
-        xp: currentUser?.xp || 0,
-        level: currentUser?.level || 1,
-        joinedDate: currentUser?.joinedDate || new Date().toISOString().split('T')[0],
-        enrolledCourses: currentUser?.enrolledCourses || [],
-        completedLessons: currentUser?.completedLessons || [],
-        completedCourses: currentUser?.completedCourses || [],
-      };
-      setCurrentUser(studentUser);
-      setRoleState('student');
-    }
+  const loginStudent = (email: string, name?: string) => {
+    const studentUser: User = {
+      id: `usr-${Date.now()}`,
+      name: name || (email ? email.split('@')[0] : 'Student User'),
+      email: email || 'student@apexflow.edu',
+      role: 'student',
+      xp: currentUser?.xp || 0,
+      level: currentUser?.level || 1,
+      joinedDate: currentUser?.joinedDate || new Date().toISOString().split('T')[0],
+      enrolledCourses: currentUser?.enrolledCourses || [],
+      completedLessons: currentUser?.completedLessons || [],
+      completedCourses: currentUser?.completedCourses || [],
+    };
+    setCurrentUser(studentUser);
   };
 
-  const register = (fullName: string, email: string) => {
+  const loginAdmin = (email: string): boolean => {
+    const adminUser: User = {
+      id: 'usr-admin-master',
+      name: 'Academy Administrator',
+      email: email || 'admin@apexflow.edu',
+      role: 'admin',
+      xp: 1000,
+      level: 10,
+      joinedDate: '2026-01-01',
+      enrolledCourses: [],
+      completedLessons: [],
+      completedCourses: [],
+    };
+    setCurrentUser(adminUser);
+    return true;
+  };
+
+  const registerStudent = (fullName: string, email: string) => {
     const newUser: User = {
       id: `usr-${Date.now()}`,
       name: fullName.trim(),
@@ -111,20 +95,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       completedCourses: [],
     };
     setCurrentUser(newUser);
-    setRoleState('student');
   };
 
   const logout = () => {
     localStorage.removeItem('apexflow_user');
     setCurrentUser(null);
-  };
-
-  const setRole = (newRole: UserRole) => {
-    setRoleState(newRole);
-    if (currentUser) {
-      const updated = { ...currentUser, role: newRole };
-      setCurrentUser(updated);
-    }
   };
 
   const updateUserStats = (xpGained: number, completedLessonId?: string, completedCourseId?: string) => {
@@ -134,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!prev) return prev;
       const newXp = prev.xp + xpGained;
       const newLevel = Math.floor(newXp / 100) + 1;
-      
+
       const newLessons = completedLessonId && !prev.completedLessons.includes(completedLessonId)
         ? [...prev.completedLessons, completedLessonId]
         : prev.completedLessons;
@@ -157,12 +132,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         currentUser,
-        role,
+        role: currentUser ? currentUser.role : null,
         isLoggedIn: !!currentUser,
-        login,
-        register,
+        loginStudent,
+        loginAdmin,
+        registerStudent,
         logout,
-        setRole,
         updateUserStats,
       }}
     >

@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GraduationCap, User, Mail, Lock, CheckCircle2, ArrowRight } from 'lucide-react';
+import { GraduationCap, User, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register } = useAuth();
+  const { registerStudent } = useAuth();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -41,7 +41,7 @@ export default function RegisterPage() {
     }
 
     // Register user with real name
-    register(fullName, email);
+    registerStudent(fullName, email);
     router.push('/dashboard');
   };
 

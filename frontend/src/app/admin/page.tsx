@@ -1,24 +1,92 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ShieldCheck,
   Users,
   BookOpen,
   Award,
-  BarChart3,
+  Lock,
+  ArrowRight,
+  Mail,
   CheckCircle2,
-  Calendar,
-  Layers,
 } from 'lucide-react';
 import { useAcademy } from '@/context/AcademyContext';
 import { useAuth } from '@/context/AuthContext';
 
 export default function AdminDashboardPage() {
   const { courses, certificates, completedCourseIds } = useAcademy();
-  const { currentUser } = useAuth();
+  const { currentUser, role, loginAdmin } = useAuth();
 
-  // Roster of students (current user + static sample roster)
+  const [adminEmail, setAdminEmail] = useState('admin@apexflow.edu');
+  const [adminPass, setAdminPass] = useState('');
+
+  const isAdmin = role === 'admin';
+
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    loginAdmin(adminEmail);
+  };
+
+  if (!isAdmin) {
+    return (
+      <div className="max-w-md mx-auto py-12 space-y-6">
+        <div className="text-center space-y-2">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-emerald-600/20">
+            <ShieldCheck className="w-7 h-7" />
+          </div>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            Administrator Portal
+          </h1>
+          <p className="text-xs text-slate-500 font-medium">
+            Sign in with administrator credentials to manage platform analytics and student rosters.
+          </p>
+        </div>
+
+        <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-slate-400" /> Admin Email
+              </label>
+              <input
+                type="email"
+                required
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                placeholder="admin@apexflow.edu"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-slate-400" /> Password
+              </label>
+              <input
+                type="password"
+                required
+                value={adminPass}
+                onChange={(e) => setAdminPass(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"
+            >
+              <span>Access Admin Dashboard</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Roster of students (current user + sample roster)
   const studentsList = [
     {
       id: currentUser?.id || 'usr-1',
