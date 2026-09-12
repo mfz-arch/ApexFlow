@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   ShieldCheck,
   Users,
@@ -10,6 +11,7 @@ import {
   ArrowRight,
   Mail,
   CheckCircle2,
+  BarChart3,
 } from 'lucide-react';
 import { useAcademy } from '@/context/AcademyContext';
 import { useAuth } from '@/context/AuthContext';
@@ -30,90 +32,150 @@ export default function AdminDashboardPage() {
 
   if (!isAdmin) {
     return (
-      <div className="-mx-4 sm:-mx-6 lg:-mx-8 -my-8 min-h-[90vh] bg-slate-950 text-slate-100 flex flex-col justify-between p-6 sm:p-10 relative overflow-hidden font-sans">
-        {/* Background Cybernetic Lines Effect */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
+      <div className="-mx-4 sm:-mx-6 lg:-mx-8 -my-8 min-h-[92vh] flex flex-col lg:flex-row font-sans bg-[#0B101D] text-slate-100 relative overflow-hidden">
+        {/* Decorative Background Swoosh Effect */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-blue-600/10 via-indigo-600/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-indigo-900/30 to-transparent rounded-full blur-2xl pointer-events-none" />
 
-        {/* Top Header Bar */}
-        <div className="relative z-10 flex items-center justify-between max-w-5xl mx-auto w-full">
-          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-slate-700 bg-slate-900/80 backdrop-blur text-sm font-extrabold tracking-wider text-slate-100 uppercase shadow-lg">
-            <span>Apex Flow Control Tower</span>
-          </div>
-          <a
-            href="/"
-            className="px-5 py-2 rounded-xl border border-slate-700 hover:border-slate-500 bg-slate-900/80 text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white transition-all"
-          >
-            Home
-          </a>
-        </div>
+        {/* Left Column - Admin Welcome & Stats Highlights (Matching Screenshot 2) */}
+        <div className="w-full lg:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-between relative z-10">
+          <div className="space-y-12">
+            {/* Top Logo */}
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-600/30">
+                A
+              </div>
+              <div>
+                <span className="font-extrabold text-lg tracking-tight text-white block leading-tight">
+                  Apex Flow
+                </span>
+                <span className="block text-[10px] font-bold tracking-widest uppercase text-blue-400">
+                  Online Academy
+                </span>
+              </div>
+            </Link>
 
-        {/* Central Control Tower Card */}
-        <div className="relative z-10 max-w-md w-full mx-auto my-auto py-8">
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl space-y-6">
-            {/* Shield Header Icon */}
-            <div className="w-16 h-16 rounded-full border border-slate-700 bg-slate-950 flex items-center justify-center mx-auto text-emerald-400 shadow-inner">
-              <ShieldCheck className="w-8 h-8" />
-            </div>
-
-            <div className="text-center space-y-1">
-              <h1 className="text-2xl font-extrabold text-white tracking-tight">
-                Management Login
+            {/* Headline & Description */}
+            <div className="space-y-4 max-w-md">
+              <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                Welcome to <br />
+                <span className="text-blue-400">Admin Portal</span>
               </h1>
-              <p className="text-xs text-slate-400 font-medium">
-                Please authenticate using your Apex Flow administrator credentials.
+              <p className="text-sm text-slate-300 font-medium leading-relaxed">
+                Manage your platform, monitor progress, and keep everything running smoothly.
               </p>
             </div>
 
-            <form onSubmit={handleAdminLogin} className="space-y-4 pt-2">
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                  Administrator WhatsApp / Phone / Email
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={adminEmail}
-                  onChange={(e) => setAdminEmail(e.target.value)}
-                  placeholder="0612509403 or admin@apexflow.edu"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-xs font-semibold text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
-                />
+            {/* 3 Admin Badges */}
+            <div className="space-y-4 max-w-sm pt-4">
+              <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md">
+                <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-bold text-slate-200">View platform statistics</span>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={adminPass}
-                  onChange={(e) => setAdminPass(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-xs font-semibold text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
-                />
+              <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md">
+                <div className="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                  <Users className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-bold text-slate-200">Manage students & courses</span>
               </div>
 
-              {/* Alert Callout */}
-              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-900/60 text-rose-300 text-xs font-semibold text-center">
-                Only Apex Flow Admins can access this Control Tower.
+              <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                  <Award className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-bold text-slate-200">Track certificates & activity</span>
               </div>
-
-              <button
-                type="submit"
-                className="w-full py-3.5 px-4 rounded-2xl border border-slate-700 bg-slate-950 hover:bg-emerald-950 hover:border-emerald-500 text-white font-extrabold text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 group"
-              >
-                <span>Access Control Tower</span>
-                <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </form>
+            </div>
           </div>
         </div>
 
-        {/* Footer Banner */}
-        <div className="relative z-10 text-center max-w-5xl mx-auto w-full">
-          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-slate-800 bg-slate-900/90 text-xs font-extrabold uppercase tracking-widest text-slate-400">
-            <span>WE CONTROL EVERYTHING HERE @2026</span>
+        {/* Right Column - White Admin Login Form Card (Matching Screenshot 2) */}
+        <div className="w-full lg:w-1/2 p-6 sm:p-12 lg:p-16 flex flex-col justify-between relative z-10">
+          {/* Top Right Logo */}
+          <div className="hidden lg:flex justify-end">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                A
+              </div>
+              <span className="text-xs font-extrabold text-slate-300">Apex Flow</span>
+            </div>
           </div>
+
+          {/* Centered White Card */}
+          <div className="max-w-md w-full mx-auto my-auto py-8">
+            <div className="bg-white rounded-3xl p-8 sm:p-10 text-slate-900 shadow-2xl space-y-6">
+              {/* Shield Icon Top */}
+              <div className="w-14 h-14 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto shadow-inner">
+                <ShieldCheck className="w-7 h-7" />
+              </div>
+
+              <div className="text-center space-y-1">
+                <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                  Admin Login
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">
+                  Secure access for platform administrators.
+                </p>
+              </div>
+
+              <form onSubmit={handleAdminLogin} className="space-y-4 pt-2">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Email address
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                    <input
+                      type="email"
+                      required
+                      value={adminEmail}
+                      onChange={(e) => setAdminEmail(e.target.value)}
+                      placeholder="admin@example.com"
+                      className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                    <input
+                      type="password"
+                      required
+                      value={adminPass}
+                      onChange={(e) => setAdminPass(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Sign In</span>
+                </button>
+              </form>
+
+              <div className="text-center pt-2">
+                <Link
+                  href="/"
+                  className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors inline-flex items-center gap-1"
+                >
+                  <span>← Back to home</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div />
         </div>
       </div>
     );

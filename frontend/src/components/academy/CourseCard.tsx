@@ -51,7 +51,7 @@ export default function CourseCard({ course }: { course: Course }) {
   const handleAction = (e: React.MouseEvent) => {
     if (!isLoggedIn) {
       e.preventDefault();
-      router.push(`/auth/register?message=Please create an account to start ${encodeURIComponent(course.title)}.`);
+      router.push('/auth/login');
     }
   };
 
