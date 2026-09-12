@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   GraduationCap,
@@ -40,8 +41,14 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/20 group-hover:bg-indigo-700 transition-colors">
-            <GraduationCap className="w-6 h-6" />
+          <div className="h-10 w-auto flex items-center justify-center overflow-hidden rounded-xl bg-white border border-slate-200 p-1 shadow-2xs group-hover:border-indigo-300 transition-colors">
+            <Image
+              src="/logo.png"
+              alt="Apex Flow Logo"
+              width={36}
+              height={36}
+              className="h-8 w-auto object-contain"
+            />
           </div>
           <div>
             <span className="font-extrabold text-xl tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   GraduationCap,
@@ -39,8 +40,14 @@ export default function LoginPage() {
         {/* Top Logo Header */}
         <div className="relative z-10 space-y-8">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-md shadow-indigo-600/30">
-              A
+            <div className="h-10 w-auto bg-white border border-slate-200 rounded-xl p-1 shadow-2xs flex items-center justify-center">
+              <Image
+                src="/logo.png"
+                alt="Apex Flow Logo"
+                width={36}
+                height={36}
+                className="h-8 w-auto object-contain"
+              />
             </div>
             <div>
               <span className="font-extrabold text-lg tracking-tight text-slate-900 block leading-tight">

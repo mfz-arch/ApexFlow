@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { GraduationCap, ShieldCheck, Award } from 'lucide-react';
+import Image from 'next/image';
+import { Award } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -12,8 +13,14 @@ export default function Footer() {
           {/* Brand */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">
-                <GraduationCap className="w-5 h-5" />
+              <div className="h-8 w-auto flex items-center justify-center rounded-lg bg-white border border-slate-200 p-0.5 shadow-2xs">
+                <Image
+                  src="/logo.png"
+                  alt="Apex Flow Logo"
+                  width={30}
+                  height={30}
+                  className="h-7 w-auto object-contain"
+                />
               </div>
               <span className="font-extrabold text-lg text-slate-900 tracking-tight">Apex Flow</span>
             </div>

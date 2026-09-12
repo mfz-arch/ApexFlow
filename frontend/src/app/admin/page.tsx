@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ShieldCheck,
   Users,
@@ -42,8 +43,14 @@ export default function AdminDashboardPage() {
           <div className="space-y-12">
             {/* Top Logo */}
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-600/30">
-                A
+              <div className="h-10 w-auto bg-white rounded-xl p-1 shadow-lg flex items-center justify-center">
+                <Image
+                  src="/logo.png"
+                  alt="Apex Flow Logo"
+                  width={36}
+                  height={36}
+                  className="h-8 w-auto object-contain"
+                />
               </div>
               <div>
                 <span className="font-extrabold text-lg tracking-tight text-white block leading-tight">
