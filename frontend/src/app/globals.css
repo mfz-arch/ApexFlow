@@ -91,7 +91,7 @@
 /* Printable A4 Landscape Certificate Formatting */
 @media print {
   @page {
-    size: A4 landscape;
+    size: landscape;
     margin: 0;
   }
 
@@ -102,36 +102,46 @@
     padding: 0 !important;
     width: 100% !important;
     height: 100% !important;
+    overflow: hidden !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  header, footer, nav, .print\:hidden {
+  header, footer, nav, .print\:hidden, [class*="Navbar"], [class*="Footer"] {
     display: none !important;
   }
 
   main {
     padding: 0 !important;
     margin: 0 !important;
-    max-width: 100% !important;
+    max-width: none !important;
     width: 100% !important;
+    height: 100% !important;
   }
 
   .printable-certificate-container {
-    width: 297mm !important;
-    height: 210mm !important;
-    max-width: 297mm !important;
-    max-height: 210mm !important;
-    margin: 0 auto !important;
-    padding: 12mm 18mm !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 10mm 16mm !important;
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
+    align-items: center !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    border: 6px solid #e0e7ff !important;
-    border-radius: 16px !important;
+    border: 10px double #4f46e5 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
     box-shadow: none !important;
+    z-index: 99999 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
