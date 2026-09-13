@@ -69,10 +69,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const apiUrl = getApiBaseUrl();
           Object.values(usersDb).forEach((u) => {
             if (u && u.role === 'student' && u.email && u.name) {
-              fetch(`${apiUrl}/auth/register`, {
+              fetch(`${apiUrl}/auth/sync`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: u.name, email: u.email }),
+                body: JSON.stringify({
+                  name: u.name,
+                  email: u.email,
+                  xp: u.xp,
+                  level: u.level,
+                  enrolledCourses: u.enrolledCourses,
+                  completedLessons: u.completedLessons,
+                  completedCourses: u.completedCourses,
+                }),
               }).catch(() => {});
             }
           });
@@ -125,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to update users database index', e);
     }
 
-    // Try backend sync
+    // Try backend login & fetch profile from MongoDB Atlas
     try {
       const apiUrl = getApiBaseUrl();
       const res = await fetch(`${apiUrl}/auth/login`, {
@@ -138,6 +146,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.token) {
           localStorage.setItem('apexflow_token', data.token);
           localStorage.setItem('token', data.token);
+        }
+        if (data.user) {
+          setCurrentUser(data.user);
+          try {
+            const dbStr = localStorage.getItem('apexflow_users_db');
+            const usersDb: Record<string, User> = dbStr ? JSON.parse(dbStr) : {};
+            usersDb[cleanEmail] = data.user;
+            localStorage.setItem('apexflow_users_db', JSON.stringify(usersDb));
+          } catch (e) {}
         }
       }
     } catch (err) {
@@ -237,6 +254,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.setItem('apexflow_token', data.token);
           localStorage.setItem('token', data.token);
         }
+        if (data.user) {
+          setCurrentUser(data.user);
+        }
       }
     } catch (err) {
       console.warn('Backend register sync warning:', err);
@@ -266,13 +286,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ? [...prev.completedCourses, completedCourseId]
         : prev.completedCourses;
 
-      return {
+      const updatedUser = {
         ...prev,
         xp: newXp,
         level: newLevel,
         completedLessons: newLessons,
         completedCourses: newCourses,
       };
+
+      // Sync stats to backend MongoDB Atlas
+      try {
+        const apiUrl = getApiBaseUrl();
+        fetch(`${apiUrl}/auth/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: updatedUser.name,
+            email: updatedUser.email,
+            xp: updatedUser.xp,
+            level: updatedUser.level,
+            enrolledCourses: updatedUser.enrolledCourses,
+            completedLessons: updatedUser.completedLessons,
+            completedCourses: updatedUser.completedCourses,
+          }),
+        }).catch(() => {});
+      } catch (e) {}
+
+      return updatedUser;
     });
   };
 
