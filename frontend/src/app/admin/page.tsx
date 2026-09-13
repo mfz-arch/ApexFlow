@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useAcademy } from '@/context/AcademyContext';
 import { useAuth } from '@/context/AuthContext';
+import { getApiBaseUrl } from '@/lib/apiClient';
 
 export default function AdminDashboardPage() {
   const { courses, certificates, completedCourseIds, approveCertificate, rejectCertificate } = useAcademy();
@@ -45,37 +46,33 @@ export default function AdminDashboardPage() {
       console.error('Failed to parse apexflow_users_db:', e);
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const apiUrl = getApiBaseUrl();
     const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
 
-    if (token) {
-      fetch(`${apiUrl}/admin/students`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((remoteStudents) => {
-          if (remoteStudents && Array.isArray(remoteStudents)) {
-            const mergedMap = new Map();
-            localStudents.forEach((st) => {
-              if (st.email) mergedMap.set(st.email.toLowerCase(), st);
-            });
-            remoteStudents.forEach((st) => {
-              if (st.email) mergedMap.set(st.email.toLowerCase(), st);
-            });
-            setRegisteredStudents(Array.from(mergedMap.values()));
-          } else {
-            setRegisteredStudents(localStudents);
-          }
-        })
-        .catch(() => {
+    fetch(`${apiUrl}/admin/students`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((remoteStudents) => {
+        if (remoteStudents && Array.isArray(remoteStudents)) {
+          const mergedMap = new Map();
+          localStudents.forEach((st) => {
+            if (st.email) mergedMap.set(st.email.toLowerCase(), st);
+          });
+          remoteStudents.forEach((st) => {
+            if (st.email) mergedMap.set(st.email.toLowerCase(), st);
+          });
+          setRegisteredStudents(Array.from(mergedMap.values()));
+        } else {
           setRegisteredStudents(localStudents);
-        });
-    } else {
-      setRegisteredStudents(localStudents);
-    }
+        }
+      })
+      .catch(() => {
+        setRegisteredStudents(localStudents);
+      });
   }, [certificates, currentUser]);
 
   const isAdmin = role === 'admin';
@@ -88,38 +85,34 @@ export default function AdminDashboardPage() {
   const handleApprove = async (certId: string) => {
     approveCertificate(certId);
     const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    if (token) {
-      try {
-        await fetch(`${apiUrl}/admin/certificates/${certId}/approve`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-      } catch (err) {
-        console.error('Failed to sync approval to backend:', err);
-      }
+    const apiUrl = getApiBaseUrl();
+    try {
+      await fetch(`${apiUrl}/admin/certificates/${certId}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+    } catch (err) {
+      console.error('Failed to sync approval to backend:', err);
     }
   };
 
   const handleReject = async (certId: string) => {
     rejectCertificate(certId);
     const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    if (token) {
-      try {
-        await fetch(`${apiUrl}/admin/certificates/${certId}/reject`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-      } catch (err) {
-        console.error('Failed to sync rejection to backend:', err);
-      }
+    const apiUrl = getApiBaseUrl();
+    try {
+      await fetch(`${apiUrl}/admin/certificates/${certId}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+    } catch (err) {
+      console.error('Failed to sync rejection to backend:', err);
     }
   };
 

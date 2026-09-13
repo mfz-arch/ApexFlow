@@ -5,6 +5,7 @@ import { Course, Certificate, TestResult } from '@/lib/types';
 import { preconfiguredCourses } from '@/lib/coursesData';
 import { generateCertificateId, formatDate } from '@/lib/utils';
 import { useAuth } from './AuthContext';
+import { getApiBaseUrl } from '@/lib/apiClient';
 
 interface AcademyContextType {
   courses: Course[];
@@ -55,7 +56,7 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Fetch remote certificates if backend available
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const apiUrl = getApiBaseUrl();
       fetch(`${apiUrl}/certificates`)
         .then((res) => (res.ok ? res.json() : null))
         .then((remoteCerts: Certificate[] | null) => {
@@ -177,14 +178,19 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
     // Attempt backend sync
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const apiUrl = getApiBaseUrl();
       fetch(`${apiUrl}/courses/${course.id}/test`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ userAnswers, timeSpentSeconds }),
+        body: JSON.stringify({
+          userAnswers,
+          timeSpentSeconds,
+          email: currentUser?.email,
+          name: currentUser?.name,
+        }),
       }).catch((err) => console.warn('Backend test submit sync warning:', err));
     } catch (err) {
       console.warn('Backend test submission error:', err);
