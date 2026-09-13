@@ -35,7 +35,7 @@ export default function CertificateDocument({ certificate }: { certificate: Cert
       </div>
 
       {/* Printable High-Resolution Educational Certificate Frame */}
-      <div className="bg-white p-8 sm:p-14 rounded-3xl border-8 border-indigo-50 shadow-xl relative overflow-hidden text-center space-y-8 print:shadow-none print:border-4 print:p-8">
+      <div className="printable-certificate-container bg-white p-8 sm:p-14 rounded-3xl border-8 border-indigo-50 shadow-xl relative overflow-hidden text-center space-y-8 print:shadow-none print:border-4 print:p-8">
         {/* Decorative Corner Accents */}
         <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-indigo-600/40 rounded-tl-xl print:hidden" />
         <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-indigo-600/40 rounded-tr-xl print:hidden" />

@@ -29,7 +29,7 @@ export default function Navbar() {
   const isAdmin = role === 'admin';
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-2xs">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-2xs print:hidden">
       {/* MindEN Labs Style Top Announcement Bar */}
       <div className="bg-slate-950 text-slate-200 text-xs py-1.5 px-4 text-center font-medium overflow-hidden border-b border-slate-800 flex items-center justify-center gap-2">
         <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
