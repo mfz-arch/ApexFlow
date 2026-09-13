@@ -40,8 +40,9 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
   // Sync state with active user
   useEffect(() => {
     try {
-      const savedCerts = localStorage.getItem('apexflow_certificates');
-      if (savedCerts) setCertificates(JSON.parse(savedCerts));
+      const savedCertsStr = localStorage.getItem('apexflow_certificates');
+      const savedCerts: Certificate[] = savedCertsStr ? JSON.parse(savedCertsStr) : [];
+      setCertificates(savedCerts);
 
       if (currentUser) {
         setEnrolledCourseIds(currentUser.enrolledCourses || []);
@@ -52,6 +53,25 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
         setCompletedLessonIds([]);
         setCompletedCourseIds([]);
       }
+
+      // Fetch remote certificates if backend available
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      fetch(`${apiUrl}/certificates`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((remoteCerts: Certificate[] | null) => {
+          if (remoteCerts && Array.isArray(remoteCerts)) {
+            setCertificates((prev) => {
+              const combined = [...remoteCerts];
+              prev.forEach((localCert) => {
+                if (!combined.some((c) => c.id === localCert.id)) {
+                  combined.push(localCert);
+                }
+              });
+              return combined;
+            });
+          }
+        })
+        .catch((err) => console.warn('Backend fetch certificates warning:', err));
     } catch (e) {
       console.error(e);
     }
@@ -152,6 +172,22 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
       updateUserStats(xpEarned, undefined, courseId);
     } else {
       updateUserStats(xpEarned);
+    }
+
+    // Attempt backend sync
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      fetch(`${apiUrl}/courses/${course.id}/test`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ userAnswers, timeSpentSeconds }),
+      }).catch((err) => console.warn('Backend test submit sync warning:', err));
+    } catch (err) {
+      console.warn('Backend test submission error:', err);
     }
 
     const result: TestResult = {

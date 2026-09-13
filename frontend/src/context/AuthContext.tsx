@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [currentUser, isLoaded]);
 
-  const loginStudent = (email: string, name?: string) => {
+  const loginStudent = async (email: string, name?: string) => {
     const cleanEmail = email.trim().toLowerCase();
     
     // Check if user exists in LocalStorage DB
@@ -75,31 +75,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to read users database', e);
     }
 
-    if (existingUser) {
-      setCurrentUser(existingUser);
-    } else {
-      const newStudent: User = {
-        id: `usr-${Date.now()}`,
-        name: name || (cleanEmail ? cleanEmail.split('@')[0] : 'Student User'),
-        email: cleanEmail || 'student@apexflow.edu',
-        role: 'student',
-        xp: 0,
-        level: 1,
-        joinedDate: new Date().toISOString().split('T')[0],
-        enrolledCourses: [],
-        completedLessons: [],
-        completedCourses: [],
-      };
-      setCurrentUser(newStudent);
+    const targetUser: User = existingUser || {
+      id: `usr-${Date.now()}`,
+      name: name || (cleanEmail ? cleanEmail.split('@')[0] : 'Student User'),
+      email: cleanEmail || 'student@apexflow.edu',
+      role: 'student',
+      xp: 0,
+      level: 1,
+      joinedDate: new Date().toISOString().split('T')[0],
+      enrolledCourses: [],
+      completedLessons: [],
+      completedCourses: [],
+    };
+
+    setCurrentUser(targetUser);
+
+    // Save to users DB index
+    try {
+      const dbStr = localStorage.getItem('apexflow_users_db');
+      const usersDb: Record<string, User> = dbStr ? JSON.parse(dbStr) : {};
+      usersDb[cleanEmail] = targetUser;
+      localStorage.setItem('apexflow_users_db', JSON.stringify(usersDb));
+    } catch (e) {
+      console.error('Failed to update users database index', e);
+    }
+
+    // Try backend sync
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${apiUrl}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem('apexflow_token', data.token);
+          localStorage.setItem('token', data.token);
+        }
+      }
+    } catch (err) {
+      console.warn('Backend login sync warning:', err);
     }
   };
 
   const loginAdmin = (email: string, name?: string): boolean => {
-    const cleanEmail = email ? email.trim().toLowerCase() : '';
+    const cleanEmail = email ? email.trim().toLowerCase() : 'aimfizahmed7@gmail.com';
     const adminUser: User = {
       id: 'usr-admin-master',
       name: name?.trim() || "AIM'FIZ AHMED IBRAHIM",
-      email: cleanEmail || 'aimfizahmed7@gmail.com',
+      email: cleanEmail,
       role: 'admin',
       xp: 1000,
       level: 10,
@@ -109,10 +135,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       completedCourses: [],
     };
     setCurrentUser(adminUser);
+
+    // Try backend admin login
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    fetch(`${apiUrl}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: cleanEmail, isAdmin: true }),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.token) {
+          localStorage.setItem('apexflow_token', data.token);
+          localStorage.setItem('token', data.token);
+        }
+      })
+      .catch((err) => console.warn('Backend admin login sync warning:', err));
+
     return true;
   };
 
-  const registerStudent = (fullName: string, email: string) => {
+  const registerStudent = async (fullName: string, email: string) => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanName = fullName.trim();
 
@@ -130,22 +173,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error(e);
     }
 
-    if (existingUser) {
-      setCurrentUser(existingUser);
-    } else {
-      const newUser: User = {
-        id: `usr-${Date.now()}`,
-        name: cleanName,
-        email: cleanEmail,
-        role: 'student',
-        xp: 0,
-        level: 1,
-        joinedDate: new Date().toISOString().split('T')[0],
-        enrolledCourses: [],
-        completedLessons: [],
-        completedCourses: [],
-      };
-      setCurrentUser(newUser);
+    const targetUser: User = existingUser || {
+      id: `usr-${Date.now()}`,
+      name: cleanName,
+      email: cleanEmail,
+      role: 'student',
+      xp: 0,
+      level: 1,
+      joinedDate: new Date().toISOString().split('T')[0],
+      enrolledCourses: [],
+      completedLessons: [],
+      completedCourses: [],
+    };
+
+    setCurrentUser(targetUser);
+
+    // Save to users DB index immediately
+    try {
+      const dbStr = localStorage.getItem('apexflow_users_db');
+      const usersDb: Record<string, User> = dbStr ? JSON.parse(dbStr) : {};
+      usersDb[cleanEmail] = targetUser;
+      localStorage.setItem('apexflow_users_db', JSON.stringify(usersDb));
+    } catch (e) {
+      console.error('Failed to save to apexflow_users_db:', e);
+    }
+
+    // Try backend registration sync
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${apiUrl}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: cleanName, email: cleanEmail }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem('apexflow_token', data.token);
+          localStorage.setItem('token', data.token);
+        }
+      }
+    } catch (err) {
+      console.warn('Backend register sync warning:', err);
     }
   };
 

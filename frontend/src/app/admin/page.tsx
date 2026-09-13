@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -31,6 +31,52 @@ export default function AdminDashboardPage() {
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPass, setAdminPass] = useState('');
   const [showAdminPass, setShowAdminPass] = useState(false);
+  const [registeredStudents, setRegisteredStudents] = useState<any[]>([]);
+
+  useEffect(() => {
+    let localStudents: any[] = [];
+    try {
+      const dbStr = localStorage.getItem('apexflow_users_db');
+      if (dbStr) {
+        const usersDb: Record<string, any> = JSON.parse(dbStr);
+        localStudents = Object.values(usersDb).filter((u) => u && u.role === 'student');
+      }
+    } catch (e) {
+      console.error('Failed to parse apexflow_users_db:', e);
+    }
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
+
+    if (token) {
+      fetch(`${apiUrl}/admin/students`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((remoteStudents) => {
+          if (remoteStudents && Array.isArray(remoteStudents)) {
+            const mergedMap = new Map();
+            localStudents.forEach((st) => {
+              if (st.email) mergedMap.set(st.email.toLowerCase(), st);
+            });
+            remoteStudents.forEach((st) => {
+              if (st.email) mergedMap.set(st.email.toLowerCase(), st);
+            });
+            setRegisteredStudents(Array.from(mergedMap.values()));
+          } else {
+            setRegisteredStudents(localStudents);
+          }
+        })
+        .catch(() => {
+          setRegisteredStudents(localStudents);
+        });
+    } else {
+      setRegisteredStudents(localStudents);
+    }
+  }, [certificates, currentUser]);
 
   const isAdmin = role === 'admin';
 
@@ -42,9 +88,10 @@ export default function AdminDashboardPage() {
   const handleApprove = async (certId: string) => {
     approveCertificate(certId);
     const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
     if (token) {
       try {
-        await fetch(`https://apexflow-backend.onrender.com/api/admin/certificates/${certId}/approve`, {
+        await fetch(`${apiUrl}/admin/certificates/${certId}/approve`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -60,9 +107,10 @@ export default function AdminDashboardPage() {
   const handleReject = async (certId: string) => {
     rejectCertificate(certId);
     const token = typeof window !== 'undefined' ? localStorage.getItem('apexflow_token') || localStorage.getItem('token') : null;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
     if (token) {
       try {
-        await fetch(`https://apexflow-backend.onrender.com/api/admin/certificates/${certId}/reject`, {
+        await fetch(`${apiUrl}/admin/certificates/${certId}/reject`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -251,22 +299,21 @@ export default function AdminDashboardPage() {
   const pendingCertificates = certificates.filter((c) => c.status === 'pending');
   const verifiedCertificates = certificates.filter((c) => c.status === 'verified');
 
-  // Real roster of students (ONLY real registered users, NO fake mock users like Michael Chang / Elena Vance)
-  const studentsList = currentUser && currentUser.role === 'student'
-    ? [
-        {
-          id: currentUser.id,
-          name: currentUser.name,
-          email: currentUser.email,
-          joinedDate: currentUser.joinedDate || '2026-01-01',
-          enrolledCount: currentUser.enrolledCourses?.length || 0,
-          completedCount: completedCourseIds.length,
-          certificatesCount: verifiedCertificates.filter(
-            (c) => c.studentId === currentUser.id || c.studentName === currentUser.name
-          ).length,
-        },
-      ]
-    : [];
+  // Real roster of registered students
+  const studentsList = registeredStudents.map((st) => {
+    const certsCount = verifiedCertificates.filter(
+      (c) => (c.studentId && c.studentId === st.id) || (c.studentName && st.name && c.studentName.toLowerCase() === st.name.toLowerCase())
+    ).length;
+    return {
+      id: st.id || st._id || st.email,
+      name: st.name || st.email?.split('@')[0] || 'Registered Student',
+      email: st.email || 'N/A',
+      joinedDate: st.joinedDate || new Date().toISOString().split('T')[0],
+      enrolledCount: st.enrolledCourses?.length || st.enrolledCount || 0,
+      completedCount: st.completedCourses?.length || st.completedCount || 0,
+      certificatesCount: certsCount,
+    };
+  });
 
   return (
     <div className="space-y-8 pb-12">
