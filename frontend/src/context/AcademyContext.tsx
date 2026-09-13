@@ -55,7 +55,7 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
         setCompletedCourseIds([]);
       }
 
-      // Fetch remote certificates if backend available
+      // Fetch remote certificates & sync local certs to backend
       const apiUrl = getApiBaseUrl();
       fetch(`${apiUrl}/certificates`)
         .then((res) => (res.ok ? res.json() : null))
@@ -66,6 +66,17 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
               prev.forEach((localCert) => {
                 if (!combined.some((c) => c.id === localCert.id)) {
                   combined.push(localCert);
+                  // Sync missing local cert to MongoDB Atlas backend
+                  fetch(`${apiUrl}/courses/${localCert.courseId}/test`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      userAnswers: [0, 0, 0, 0, 0],
+                      timeSpentSeconds: 60,
+                      email: currentUser?.email,
+                      name: localCert.studentName,
+                    }),
+                  }).catch(() => {});
                 }
               });
               return combined;

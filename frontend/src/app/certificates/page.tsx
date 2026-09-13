@@ -12,7 +12,9 @@ export default function CertificatesListPage() {
 
   const studentName = currentUser?.name || 'Student';
   const myCertificates = certificates.filter(
-    (c) => c.studentName === studentName || c.studentId === currentUser?.id
+    (c) =>
+      (c.studentName && studentName && c.studentName.toLowerCase() === studentName.toLowerCase()) ||
+      (c.studentId && currentUser?.id && c.studentId === currentUser.id)
   );
 
   return (

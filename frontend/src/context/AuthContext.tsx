@@ -59,6 +59,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [currentUser, isLoaded]);
 
+  // Auto-sync all local users in apexflow_users_db to MongoDB Atlas
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        const dbStr = localStorage.getItem('apexflow_users_db');
+        if (dbStr) {
+          const usersDb: Record<string, User> = JSON.parse(dbStr);
+          const apiUrl = getApiBaseUrl();
+          Object.values(usersDb).forEach((u) => {
+            if (u && u.role === 'student' && u.email && u.name) {
+              fetch(`${apiUrl}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: u.name, email: u.email }),
+              }).catch(() => {});
+            }
+          });
+        }
+      } catch (e) {
+        console.error('Auto sync users failed:', e);
+      }
+    }
+  }, [isLoaded]);
+
   const loginStudent = async (email: string, name?: string) => {
     const cleanEmail = email.trim().toLowerCase();
     

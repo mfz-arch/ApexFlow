@@ -63,7 +63,9 @@ export default function DashboardPage() {
 
   const enrolledCourses = courses.filter((c) => enrolledCourseIds.includes(c.id));
   const earnedCertificates = certificates.filter(
-    (cert) => cert.studentName === studentName || cert.studentId === currentUser.id
+    (cert) =>
+      (cert.studentName && studentName && cert.studentName.toLowerCase() === studentName.toLowerCase()) ||
+      (cert.studentId && currentUser.id && cert.studentId === currentUser.id)
   );
 
   return (
